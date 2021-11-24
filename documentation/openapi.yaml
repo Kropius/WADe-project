@@ -1,0 +1,265 @@
+openapi: 3.0.1
+info:
+  title: RAT - WADe Project
+  description: |+
+    ### Tell REST what to do and thake a rest
+
+    This file represents the OpenAPI 3.0 specification of the [RAT WADe Project](https://profs.info.uaic.ro/~busaco/teach/courses/wade/projects/index.html) of Fall 2021 made by Cioata Matei-Alexandru, Lipan Radu-Matei, Rezmerita Mihnea-Ioan. More information on what this api helps to achive can be found in the link attached.
+    
+    The list below represents a necessary but not sufficient list of REST routes neccesar to create a tool which allows interacting with a REST API using natural language. The list will be updated as the project evolves.
+
+  version: 1.0.0
+servers:
+- url: https://rat.wade.info.uaic.ro/api/v1
+security:
+- HeaderKey: []
+paths:
+  /apis:
+    post:
+      tags:
+      - Apis
+      summary: Creates a new Api entry in our database
+      operationId: postApi
+      requestBody:
+        description: Api specification to be processed and stored
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiSpecification"
+        required: true
+      responses:
+        201:
+          description: Created
+          content: {}
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+        409:
+          description: Conflict
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+        412:
+          description: Precondition Failed
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+  /apis/{id}:
+    get:
+      tags:
+      - Apis
+      summary: Get all data about a stored Api
+      operationId: getApi
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Api"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+  /apis/specifications:
+    get:
+      tags:
+      - Apis
+      summary: Lists all stored api specifications
+      operationId: listApispecifications
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ApiSpecification"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+  /apis/:id/nlp-to-rest:
+    post:
+      tags:
+      - Apis
+      summary: Translate a command given in natural language into a valid REST request
+      operationId: nlpToRest
+      requestBody:
+        description: Natural language text to be transformed into a valid REST request for the API specified
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+        required: true
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/RestRequest"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+        412:
+          description: Precondition Failed
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Api:
+      type: object
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+        openApiSpecificationUrl:
+          type: string
+        authenticationType:
+          type: string
+          enum: [None, ApiKey, OAuth]
+        credentials:
+          type: array
+          items:
+            $ref: "#/components/schemas/Dictionary"
+        endpoints:
+          type: array
+          items:
+            type: object
+            properties:
+              verb:
+                type: string
+                enum: [GET, POST, PUT, PATCH, DELETE]
+              path:
+                type: string
+              body:
+                type: object
+              entity:
+                type: string
+              attributes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    paramName:
+                      type: string
+                    paramType:
+                      type: string
+                      enum: [Query, Body, Path]
+    Error:
+      type: object
+      properties:
+        status:
+          type: "string"
+        type:
+          type: "string"
+        message:
+          type: "string"
+    Dictionary:
+      type: object
+      properties:
+        key:
+          type: "string"
+        value:
+          type: "string"
+    RestRequest:
+      type: object
+      properties:
+        verb:
+          type: string
+        url:
+          type: string
+        headers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Dictionary"
+        body:
+          type: string
+    ApiSpecification:
+      type: object
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+        openApiSpecificationUrl:
+          type: string
+        authenticationType:
+          type: string
+          enum: [None, ApiKey, OAuth]
+        credentials:
+          type: array
+          items:
+            $ref: "#/components/schemas/Dictionary"
+  securitySchemes:
+    HeaderKey:
+      type: apiKey
+      description: The RAT API Key will be used to check that the client application making the call to the API has access to do so.
+      name: X-RAT-Key
+      in: header

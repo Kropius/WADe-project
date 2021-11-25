@@ -1,0 +1,27 @@
+body
+{
+	margin-left:20%;
+	margin-right:20%;
+}
+
+article header
+{
+	text-align: center;
+}
+
+article header h2
+{
+	margin: 0px;
+}
+
+article header ul
+{
+	position: relative;
+	right: 2%;
+	margin: 0px;
+}
+
+article section section figure
+{
+	margin-bottom: 10%;
+}

@@ -8,3 +8,4 @@
 
 3. ### [Architecture and Design](https://github.com/Kropius/WADe-project/blob/main/documentation/ArchitectureAndDesign)
     - [Overview](https://github.com/Kropius/WADe-project/blob/main/documentation/ArchitectureAndDesign/rat-overview.png)
+    - [Initial Frontend Design](https://github.com/Kropius/WADe-project/blob/main/documentation/ArchitectureAndDesign/rat-frontend.png)

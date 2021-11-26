@@ -74,8 +74,39 @@
         </section>
         <section>
             <h2>3. Architecture</h2>
+                <figure typeOf="sa:image">
+                    <img src="../ArchitectureAndDesign/rat-overview.png" alt="App's Architecture">
+                    <figcaption style="text-align: center;">Fig. 2: App's Architecture</figcaption>
+            </figure>
             <p> &emsp; &emsp;
-                TBD
+                The whole backend application will be built using <a href="https://cloud.google.com/">Google Cloud Services</a>.
+            It was chosen over other cloud services providers because of the generous <a href="https://cloud.google.com/free">free tier</a> provided.
+            </p>
+            <p> &emsp; &emsp;
+                The main computation provider will be <a href="https://cloud.google.com/functions">Google Cloud Functions</a>. The FaaS approach will 
+            help us better decouple the logic between our endpoints while keeping costs at a minimum with the "pay as you go" approach of such services.
+            We will be able to chose our programming language based on what that function needs to do (in example, python for NLP, NodeJs for CRUD operations
+            on our noSql Database) without needing to setup a separate server for that language as well. One main drawback of this approach would be the 
+            "cold starts" that appear on log traffic but there are workarounds for that: some ligh weight languages and frameworks like NodeJs have a way smaller
+            cold starts than others like Java and if that's not enough we can always put in place a warmup system. In order to provide a common interface and url
+            for all our functions, we will be using <a href="https://cloud.google.com/api-gateway">Google Cloud API Gateway</a>. This way we have a single point where
+            we need to setup the authentication for our api and where we can check that everything specified in <a href="../OpenApi/openapi.yaml">our OpenAPI specification</a>
+            is indeed followed accordingly.
+            </p>
+            <p> &emsp; &emsp;
+                For storage we will be using <a href="https://cloud.google.com/firestore">Firesore</a>, Google Cloud's main NoSQL solution. We'll be going with noSql
+            because we have only one type of entities: apis; and we don't have any complex relationships between entities besides some child-parent relationships
+            (api-endpoints-atributes). Also, the change of one child doesn't need to be reflected in all other of its appearences so we don't have a need for normalisation.
+            </p>
+            <p> &emsp; &emsp;
+                We will also be using <a href="https://cloud.google.com/natural-language">Google Cloud Natural Language Processing API</a> and 
+            <a href="https://cloud.google.com/text-to-speech">Google Cloud Text-To-Speech API</a> as described in <em>"4. Natural Language Processing"</em>
+            and <em>4.1 Optional Preprocessing: Speech recognition</em> respectively.
+            </p>
+            <p> &emsp; &emsp;
+                We need only one page in our frontend app, so using SPA framework is an intuitive solution. We will be using Angular or React for that. Because of thei nature,
+            SPAs don't need computaion power for hosting so we are fine with using <a href="https://cloud.google.com/storage">Google Cloud Storage</a> in order to provide our
+            single <em>index.html</em> file and its dependencies to client browsers.
             </p>
         </section>
         <section>
@@ -218,10 +249,13 @@
             <h2>6. Front-end</h2>
             <p> &emsp; &emsp; The use will interact with a single-page application(SPA), built with React or Angular. </p>
             <figure typeOf="sa:image" class="ignore-margins">
-                <img src="../ArchitectureAndDesign/rat-frontend.png" alt="Frontend Design">
-                <figcaption style="text-align: center;">Fig. 5: Front-end concept</figcaption>
+                <img src="../ArchitectureAndDesign/rat-frontend-highlighted.png" alt="Frontend Design">
+                <figcaption style="text-align: center;">Fig. 2: Front-end concept</figcaption>
             </figure>
-            <p>&emsp; &emsp; The design above is more of a guideline and might not be replicated perfectly. </p>
+            <p>&emsp; &emsp;
+                The design above is more of a guideline and might not be replicated perfectly. Highlited we have short explanations for each ui element
+            and how it is going to interact with our API. The SwaggerUI component will be created by using <a href="https://www.npmjs.com/package/angular-swagger-ui">angular-swagger-ui</a>.
+            </p>
 
         </section>
         <section>

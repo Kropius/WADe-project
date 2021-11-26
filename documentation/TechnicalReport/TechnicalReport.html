@@ -81,6 +81,91 @@
         <section>
             <h2>4. Natural Language Processing</h2>
             <p> &emsp; &emsp;
+				In order to facilitate text/voice interaction with our application, we decided to use Google Cloud’s Natural Language AI. 
+				This service will help with the sentence analysis and parsing, providing useful data that takes the program one step closer 
+				to an output in the form of a valid REST request. 
+			</p>
+			<p>
+				&emsp; &emsp;
+				“The Cloud Natural Language API provides natural language understanding technologies to developers, including sentiment 
+				analysis, entity analysis, entity sentiment analysis, content classification, and syntax analysis.” (1)
+			</p>
+			<p>
+				&emsp; &emsp;
+				The most useful functionality in our case is the syntax analysis, as it inspects the structure of the language. In other 
+				words, when the user writes a command in the form of a sentence and passes it to the Natural Language API, it is broken 
+				into tokens (words) which are returned along with detailed linguistic information: part of speech, morphology and most 
+				importantly, dependency tree. 
+			</p>
+			<p>
+				&emsp; &emsp;
+				All of this data represents the input for our REST request builder algorithm. The main idea of it is to build a syntactic 
+				tree using the information from Natural Language API and then to match the key words from the nodes with the input API 
+				specification. In order to form the syntactic tree from the sentence, we need to follow a set of rules:
+			</p>
+			<ul>
+                <li>
+					<em>Identifying the root: </em> it is usually a verb at imperative mood (also marked with root label by the Natural 
+					Language API). For example, this verb can be “Show”, “Create” etc.. Unfortunately, this is not always the case as we can 
+					have expressions like “I want to add …” where “want” is the root verb of the sentence, but “add” is the REST correspondent 
+					for the POST operation. Therefore, the root of the syntactic tree will be the verb that matches any HTTP operation the most;
+				</li>
+                <li>
+					<em>Identifying the main entity: </em> this step is trivial as the Natural Language API provides a direct dependency 
+					between the verb defining the REST operation and the main entity;
+				</li>
+                <li>
+					<em>Identifying the attribute names of an entity: </em>  as we descend the dependency tree of a main entity, all of 
+					the nouns represent attribute names (if multiple attributes of the same entity are specified, they will appear on 
+					successive levels in the dependency tree);
+				</li>
+                <li>
+					<em>Identifying the attribute values: </em>  Natural Language API provides a direct dependency between nouns and 
+					corresponding adjectives, numerals and determiners;
+				</li>
+				<li>
+					Parts of speech other than nouns, adjectives, numerals, verbs and determiners will be ignored in the tree building process.
+				</li>
+            </ul>
+			<p>
+				&emsp; &emsp;
+				The syntactic tree is getting close to forming the valid REST request as it offers information about the HTTP verb and 
+				the main entities along with their attribute names and values, but there is one more major problem: some words might be 
+				unknown. Let’s take an example: “Show me all cats with blue colouring.”. The final tree will have the following form:
+			</p>
+			<figure typeOf="sa:image" class="ignore-margins">
+                <img src="../ArchitectureAndDesign/rat-nlp-algorithm-example.png" alt="RAT Syntactic tree example" style="width:40%">
+                <figcaption style="text-align: center;">Fig. 3: RAT - Syntactic tree example</figcaption>
+            </figure>
+			<p>
+				&emsp; &emsp;
+				The match for the above request would be GET on path /cats?color=blue. Even though “colouring” resembles “color”, we need a
+				way to match these words. A very good candidate for this would be Word2Vec or any similar tool.
+			</p>
+			<p>
+				&emsp; &emsp;
+				“Word2vec is a technique for natural language processing published in 2013. The word2vec algorithm uses a neural network 
+				model to learn word associations from a large corpus of text.” (2) This tool offers the possibility to easily detect 
+				synonyms or related words, based on a score. The root verb will always be detected this way. In the beginning of the 
+				algorithm, we can set a default pair for each HTTP verb (for example: GET - “Provide”, POST - “Create”, PUT - “Replace”, 
+				DELETE - “Delete”, PATCH - “Update”). Using Word2Vec, “Show” will be matched with “Provide” with a high score, therefore 
+				matching with GET.
+			</p>
+			<p>
+				&emsp; &emsp;
+				As an observation from the above example, “all” has been kept in the syntactic tree. It is a determiner and it communicates 
+				that all cats should be retrieved. Another valid determiner would be “a” in which case a single cat should be retrieved 
+				(the first one or a random one). There are also examples that should be ignored: “the”, “this”, “few” etc..
+			</p>
+			<p>
+				&emsp; &emsp;
+				The given syntactic tree was built using the following output of the Native Language API:
+			</p>
+			<figure typeOf="sa:image" class="ignore-margins">
+                <img src="../ArchitectureAndDesign/google-nlp-output-example.png" alt="Google NLP Output example" style="width: 60%">
+                <figcaption style="text-align: center;">Fig. 4: Google NLP - output example</figcaption>
+            </figure>
+
             <h3>4.1 Optional Preprocessing: <em>Speech recognition</em> </h3>
             <p>&emsp; &emsp;
                 A nice bonus would be to have speech recognition capabilities, meaning that user will be able
@@ -96,7 +181,7 @@
                     Send the recording to <a href="https://cloud.google.com/speech-to-text">Google Cloud Speech-To-Text</a> service;
                  </li>
                  <li>
-                     Use the text returned as the text <en>typed</en> by our user in incoming steps;
+                     Use the text returned as the text <em>typed</em> by our user in incoming steps;
                  </li>
             </ol>
         </section>
@@ -134,16 +219,24 @@
             <p> &emsp; &emsp; The use will interact with a single-page application(SPA), built with React or Angular. </p>
             <figure typeOf="sa:image" class="ignore-margins">
                 <img src="../ArchitectureAndDesign/rat-frontend.png" alt="Frontend Design">
-                <figcaption style="text-align: center;">Fig. 2: Front-end concept</figcaption>
+                <figcaption style="text-align: center;">Fig. 5: Front-end concept</figcaption>
             </figure>
             <p>&emsp; &emsp; The design above is more of a guideline and might not be replicated perfectly. </p>
 
         </section>
         <section>
             <h2>7. Bibliography</h2>
-            <p> &emsp; &emsp;
-                TBD
-            </p>
+            <ol>
+				<li> <a href="https://cloud.google.com/natural-language/docs/basics">Google Cloud - Natural Language API</a> </li>
+				<li> <a href="https://en.wikipedia.org/wiki/Word2vec">Word2Vec - Word Association tool</a> </li>
+				<li> <a href="https://arxiv.org/pdf/2007.15280.pdf">PHOTON: A Robust Cross-Domain Text-to-SQL System - Jichuan Zeng, Xi Victoria Lin,
+				Caiming Xiong, Richard Socher, Michael R. Lyu, Irwin King, Steven C.H. Hoi</a> </li>
+				<li> <a href="https://cloud.google.com/api-gateway/docs">Google Cloud - API Gateway </a> </li>
+				<li> <a href="https://cloud.google.com/functions#section-4">Google Cloud Functions</a> </li>
+				<li> <a href="https://cloud.google.com/storage#section-4">Google Cloud Storage</a> </li>
+				<li> <a href="https://firebase.google.com/products/firestore">Cloud Firestore</a> </li>
+				<li> <a href="https://cloud.google.com/speech-to-text#section-6">Google Cloud - Speech to Text</a> </li>
+			</ol>
         </section>
 
     </article>

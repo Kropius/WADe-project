@@ -85,22 +85,22 @@
             <p> &emsp; &emsp;
                 The main computation provider will be <a href="https://cloud.google.com/functions">Google Cloud Functions</a>. The FaaS approach will 
             help us better decouple the logic between our endpoints while keeping costs at a minimum with the "pay as you go" approach of such services.
-            We will be able to chose our programming language based on what that function needs to do (in example, python for NLP, NodeJs for CRUD operations
+            We will be able to choose our programming language based on what that function needs to do (in example, python for NLP, NodeJs for CRUD operations
             on our noSql Database) without needing to setup a separate server for that language as well. One main drawback of this approach would be the 
-            "cold starts" that appear on log traffic but there are workarounds for that: some ligh weight languages and frameworks like NodeJs have a way smaller
+            "cold starts" that appear on log traffic but there are workarounds for that: some light weight languages and frameworks like NodeJs have a way smaller
             cold starts than others like Java and if that's not enough we can always put in place a warmup system. In order to provide a common interface and url
             for all our functions, we will be using <a href="https://cloud.google.com/api-gateway">Google Cloud API Gateway</a>. This way we have a single point where
             we need to setup the authentication for our api and where we can check that everything specified in <a href="../OpenApi/openapi.yaml">our OpenAPI specification</a>
             is indeed followed accordingly.
             </p>
             <p> &emsp; &emsp;
-                For storage we will be using <a href="https://cloud.google.com/firestore">Firesore</a>, Google Cloud's main NoSQL solution. We'll be going with noSql
+                For storage we will be using <a href="https://cloud.google.com/firestore">Firestore</a>, Google Cloud's main NoSQL solution. We'll be going with noSql
             because we have only one type of entities: apis; and we don't have any complex relationships between entities besides some child-parent relationships
-            (api-endpoints-atributes). Also, the change of one child doesn't need to be reflected in all other of its appearences so we don't have a need for normalisation.
+            (api-endpoints-attributes). Also, the change of one child doesn't need to be reflected in all of its other appearences so we don't have a need for normalisation.
             </p>
             <p> &emsp; &emsp;
                 We will also be using <a href="https://cloud.google.com/natural-language">Google Cloud Natural Language Processing API</a> and 
-            <a href="https://cloud.google.com/text-to-speech">Google Cloud Text-To-Speech API</a> as described in <em>"4. Natural Language Processing"</em>
+            <a href="https://cloud.google.com/speech-to-text">Google Cloud Speech-To-Text API</a> as described in <em>"4. Natural Language Processing"</em>
             and <em>4.1 Optional Preprocessing: Speech recognition</em> respectively.
             </p>
             <p> &emsp; &emsp;

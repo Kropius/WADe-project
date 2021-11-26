@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title> Documentație finală AcaTisM </title>
+    <title> RAT - Technical report </title>
     <link rel="stylesheet" href="TechnicalReport.css">
 </head>
 
@@ -42,44 +42,122 @@
                 The application Rest Api Interactive Tool(known as RAT) is a web tool that uses natural language
                 constructs to interact with different REST APIs, specifically their OpenApi
                 documentation. Based on this, a human-like(text based/voice) interaction with the given APIs will be
-                possible. The end user will have the possibility to upload a valid OpenApi
-                document, so the user will be able to interact in a natural manner with the API using the web interface
+                possible. The end user will have the possibility to select an API, from predefined list, or upload one.
+                He will be able to interact in a natural manner with the API using the web interface
                 of the application.
-
             <p>
-                &emsp; &emsp; The application will be able to determine valid routes, with valid request bodies or even query
-                parameters based on the user input according to the uploaded/selected RestApi.
+                &emsp; &emsp; The application will be able to determine valid routes, with valid request bodies or even
+                query
+                parameters based on the user input according to the selected RestApi.
             </p>
 
             </p>
+        </section>
+        <section>
             <h2>2. Usecase</h2>
             <p> &emsp; &emsp;
-                TBD
+            <figure typeOf="sa:image" class="img-containter">
+                <div>
+                    <img src="useCase.jpg" alt="Usecase diagram">
+                    <figcaption style="text-align: center;">Fig. 1: Usecase diagram</figcaption>
+                </div>
+            </figure>
+            <p>
+                The above diagram displays the possible ways the user can interact with the application:
+            <ul>
+                <li><em>Uploads a valid OpenApi documentation:</em> The user can upload an OpenApi documentation </li>
+                <li><em>Choose an available API: </em> The user will select a certain API from the given list, and the
+                    application will make the future translation based on the selected API </li>
+                <li><em>Types a request: </em> The user can type anything he wants and the application will try to map
+                    his <em>request</em> to a valid route with a valid body </li>
+                <li><em>Uses speech recognition in order to send the request: </em> The user speak aloud his request and
+                    the application will parse his <em>request</em> in order to return a valid route with a valid body
+
+            </ul>
+            </p>
             </p>
 
+        </section>
+        <section>
             <h2>3. Architecture</h2>
-            <p> &emsp; &emsp;
-                TBD
-            </p>
-            <h2>4. NLP</h2>
-            <p> &emsp; &emsp;
-                TBD
-            </p>
-            <h2>5. Rest API</h2>
-            <p> &emsp; &emsp;
-                TBD
-            </p>
-            <h2>6. Front-end</h2>
-            <p> &emsp; &emsp;
-                TBD
-            </p>
-            <h2>7. Bibliography</h2>
             <p> &emsp; &emsp;
                 TBD
             </p>
         </section>
         <section>
+            <h2>4. NLP</h2>
+            <p> &emsp; &emsp;
+            <h3>4.1 Speech recognition</h3>
+            <p>&emsp; &emsp;
+                The presented application needs to have speech recognition capabilities, meaning that user will be able
+                to use his voice in order to <em>type</em> his request.
+
+                Having this in mind we have the following ways to parse the user's speech input.
+            </p>
+            <ol>
+                <li>
+                    <em>Client side parsing</em>:
+                    <ul>
+                        <li>
+                            meaning that an external library will be used at the client level, or
+                            even a native functionality that most browsers have(or should have) in order to convert the
+                            speech to text;
+                        </li>
+                        </li> after this the resulted text will be displayed so that the user will acknowledge what the
+                              request will actually look like</li>
+                        <li> this approach is more user friendly because of the fact the user always be able to see how was his
+                             speech parsed</li>
+                    </ul>
+
+                </li>
+                <li>
+                    <em>Server side parsing</em>:
+                    <ul>
+                        <li>meaning that the user's speech input will be parsed at the server level using one of the many tools Google Cloud has</li>
+                        <li>anytime the user tries to use the speech input, his input will be sent to the server and the server will turn it into a text</li>
+                        <li>
+                            now that the server has the converted speech input from the user as text, it can parse the resulted text and return back to the user the path and the body according to its initial request 
+                        </li>
+                        <li>this approach can have better results, due to the fact the Google Cloud tools for speech recognition are very accurate</li>
+                        <li>however the user will not be able to see how his speech was converted to text</li>
+                        <li>a solution for the above drawback is to return to the user, the text resulted from his speech translation</li>
+                    </ul>
+                </li>
+
+            </ol>
+            </p>
         </section>
+        <section>
+            <h2>5. Rest API</h2>
+            <p> &emsp; &emsp;
+                TBD
+            </p>
+        </section>
+        <section>
+            <h2>6. Front-end</h2>
+            <p> &emsp; &emsp; The use will interact with a single-page application(SPA), built with React, CSS and
+                obviously JSX. </p>
+            <figure typeOf="sa:image" class="img-containter">
+                <div>
+                    <img src="rat-frontend.png" alt="Usecase diagram">
+                    <figcaption style="text-align: center;">Fig. 2: Front-end concept</figcaption>
+                </div>
+            </figure>
+            <p>&emsp; &emsp; However the above design will not be completely replicated. Our purpose and goal is to use
+                the library <a href="https://www.npmjs.com/package/@awsui/components-react">AWSUI</a>, built obviously
+                by Amazon. This library is also used in AWS console, and provides a collection of reusable and
+                responsive React components.</p>
+
+        </section>
+        <section>
+
+        </section>
+        <h2>7. Bibliography</h2>
+        <p> &emsp; &emsp;
+            TBD
+        </p>
+        </section>
+
     </article>
 </body>
 

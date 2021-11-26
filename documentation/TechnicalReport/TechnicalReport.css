@@ -25,3 +25,16 @@ article section section figure
 {
 	margin-bottom: 10%;
 }
+
+.img-containter { 
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap:40px 50px;
+}
+
+img{
+	width: 700px;
+	height: 700px;
+}

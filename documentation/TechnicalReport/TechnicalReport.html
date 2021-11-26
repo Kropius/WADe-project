@@ -42,7 +42,7 @@
                 The application Rest Api Interactive Tool(known as RAT) is a web tool that uses natural language
                 constructs to interact with different REST APIs, specifically their OpenApi
                 documentation. Based on this, a human-like(text based/voice) interaction with the given APIs will be
-                possible. The end user will have the possibility to select an API, from predefined list, or upload one.
+                possible. The end user will have the possibility to select an API, from a predefined list, or upload one.
                 He will be able to interact in a natural manner with the API using the web interface
                 of the application.
             <p>
@@ -65,7 +65,7 @@
             <p>
                 The above diagram displays the possible ways the user can interact with the application:
             <ul>
-                <li><em>Uploads a valid OpenApi documentation:</em> The user can upload an OpenApi documentation </li>
+                <li><em>Uploads a valid OpenApi documentation:</em> The user can upload an OpenApi documentation</li>
                 <li><em>Choose an available API: </em> The user will select a certain API from the given list, and the
                     application will make the future translation based on the selected API </li>
                 <li><em>Types a request: </em> The user can type anything he wants and the application will try to map
@@ -103,21 +103,23 @@
                             even a native functionality that most browsers have(or should have) in order to convert the
                             speech to text;
                         </li>
-                        </li> after this the resulted text will be displayed so that the user will acknowledge what the
+                        <li> after this the resulted text will be displayed so that the user will acknowledge what the
                               request will actually look like</li>
-                        <li> this approach is more user friendly because of the fact the user always be able to see how was his
-                             speech parsed</li>
+                        <li> this approach is more user friendly because of the fact the user always be able to see how his
+                             speech was parsed</li>
                     </ul>
 
                 </li>
                 <li>
+
                     <em>Server side parsing</em>:
                     <ul>
                         <li>meaning that the user's speech input will be parsed at the server level using one of the many tools Google Cloud has</li>
                         <li>anytime the user tries to use the speech input, his input will be sent to the server and the server will turn it into a text</li>
                         <li>
-                            now that the server has the converted speech input from the user as text, it can parse the resulted text and return back to the user the path and the body according to its initial request 
+                            now that the server has the speech input from the user as a text, the text can be parsed just like a normal typed input
                         </li>
+                        <li> after this the server will return back to the user the path and the body according to his initial request </li>
                         <li>this approach can have better results, due to the fact the Google Cloud tools for speech recognition are very accurate</li>
                         <li>however the user will not be able to see how his speech was converted to text</li>
                         <li>a solution for the above drawback is to return to the user, the text resulted from his speech translation</li>
@@ -130,7 +132,21 @@
         <section>
             <h2>5. Rest API</h2>
             <p> &emsp; &emsp;
-                TBD
+                The following routes are available:
+                <ul>
+                    <li>
+                        <b>/apis</b> [POST]: creates a new Api entry in the database
+                    </li>
+                    <li>
+                        <b>/apis/{id}</b> [GET]: returns all data about the api with the given <em>id</em>
+                    </li>
+                    <li>
+                        <b>/apis/specifications</b> [GET]: lists all stored api specifications
+                    </li>
+                    <li>
+                        <b>/apis/:id/nlp-to-rest </b> [POST]: Translate a command given in natural language into a valid REST request
+                    </li>
+                </ul>
             </p>
         </section>
         <section>

@@ -2,6 +2,7 @@ body
 {
 	margin-left:20%;
 	margin-right:20%;
+	text-align: justify;
 }
 
 article header
@@ -26,15 +27,15 @@ article section section figure
 	margin-bottom: 10%;
 }
 
-.img-containter { 
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	justify-content: center;
-	gap:40px 50px;
+.ignore-margins {
+	margin-left:-25%;
+	margin-right:-25%;
 }
 
 img{
-	width: 700px;
-	height: 700px;
+	display: block;
+  	margin-left: auto;
+  	margin-right: auto;
+	width: 100%;
+	height: auto;
 }

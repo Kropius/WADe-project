@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: RAT - WADe Project
   description: |+
-    ### Tell REST what to do and thake a rest
+    ### Tell REST what to do and take a rest
 
     This file represents the OpenAPI 3.0 specification of the [RAT WADe Project](https://profs.info.uaic.ro/~busaco/teach/courses/wade/projects/index.html) of Fall 2021 made by Cioata Matei-Alexandru, Lipan Radu-Matei, Rezmerita Mihnea-Ioan. More information on what this api helps to achive can be found in the link attached.
     

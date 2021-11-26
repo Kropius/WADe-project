@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-EN">
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
@@ -40,43 +40,37 @@
             <h2> 1. Description </h2>
             <p> &emsp; &emsp;
                 The application Rest Api Interactive Tool(known as RAT) is a web tool that uses natural language
-                constructs to interact with different REST APIs, specifically their OpenApi
-                documentation. Based on this, a human-like(text based/voice) interaction with the given APIs will be
-                possible. The end user will have the possibility to select an API, from a predefined list, or upload one.
-                He will be able to interact in a natural manner with the API using the web interface
-                of the application.
+                constructs to interact with different REST APIs based on their OpenApi
+                documentation. With this, a human-like(text based/voice) interaction with the given APIs will be
+                possible. The end user will have the possibility to select an API, from a predefined list, or upload 
+                the OpenAPI specification of one. He will be able to interact in a natural manner with the API using
+                the web interface of the application.
+            </p>
             <p>
                 &emsp; &emsp; The application will be able to determine valid routes, with valid request bodies or even
-                query
-                parameters based on the user input according to the selected RestApi.
-            </p>
-
+                query parameters, according to the selected RestApi, based on the user's commands in natural language.
             </p>
         </section>
         <section>
             <h2>2. Usecase</h2>
-            <p> &emsp; &emsp;
-            <figure typeOf="sa:image" class="img-containter">
-                <div>
-                    <img src="useCase.jpg" alt="Usecase diagram">
+            <figure typeOf="sa:image">
+                    <img src="../ArchitectureAndDesign/use-case.jpg" alt="Usecase diagram">
                     <figcaption style="text-align: center;">Fig. 1: Usecase diagram</figcaption>
-                </div>
             </figure>
             <p>
-                The above diagram displays the possible ways the user can interact with the application:
+                &emsp; &emsp; The above diagram displays the possible ways the user can interact with the application:
+            </p>
             <ul>
-                <li><em>Uploads a valid OpenApi documentation:</em> The user can upload an OpenApi documentation</li>
-                <li><em>Choose an available API: </em> The user will select a certain API from the given list, and the
-                    application will make the future translation based on the selected API </li>
-                <li><em>Types a request: </em> The user can type anything he wants and the application will try to map
-                    his <em>request</em> to a valid route with a valid body </li>
-                <li><em>Uses speech recognition in order to send the request: </em> The user speak aloud his request and
-                    the application will parse his <em>request</em> in order to return a valid route with a valid body
-
+                <li><em>Uploads a valid OpenApi documentation:</em> The user can upload an OpenApi documentation that will
+                    be parsed and saved on the server side to facilitate future queries in natural language.</li>
+                <li><em>Choose an available API: </em> The user will select a certain API from the given list of previously
+                    added APIs. The application will make the future translation based on this API.</li>
+                <li><em>Types a request: </em> The user can type any sentance he wants and the application will try to map
+                    it to a valid <em>route</em>, <em>body</em>, <em>Rest verb</em> and <em>parameters</em> </li>
+                <li><em>Uses speech recognition in order to send the request: </em> Similar to <em>Types a request</em> but
+                    this time, the user speak aloud his request and the application will transform the recording to text and
+                    then return a valid <em>route</em>, <em>body</em>, <em>Rest verb</em> and <em>parameters</em> </li>
             </ul>
-            </p>
-            </p>
-
         </section>
         <section>
             <h2>3. Architecture</h2>
@@ -85,93 +79,71 @@
             </p>
         </section>
         <section>
-            <h2>4. NLP</h2>
+            <h2>4. Natural Language Processing</h2>
             <p> &emsp; &emsp;
-            <h3>4.1 Speech recognition</h3>
+            <h3>4.1 Optional Preprocessing: <em>Speech recognition</em> </h3>
             <p>&emsp; &emsp;
-                The presented application needs to have speech recognition capabilities, meaning that user will be able
+                A nice bonus would be to have speech recognition capabilities, meaning that user will be able
                 to use his voice in order to <em>type</em> his request.
 
-                Having this in mind we have the following ways to parse the user's speech input.
+                In order to do this, we will have to:
             </p>
             <ol>
                 <li>
-                    <em>Client side parsing</em>:
-                    <ul>
-                        <li>
-                            meaning that an external library will be used at the client level, or
-                            even a native functionality that most browsers have(or should have) in order to convert the
-                            speech to text;
-                        </li>
-                        <li> after this the resulted text will be displayed so that the user will acknowledge what the
-                              request will actually look like</li>
-                        <li> this approach is more user friendly because of the fact the user always be able to see how his
-                             speech was parsed</li>
-                    </ul>
-
+                   Let the user record his voice and save it in cookies or browser storage;
                 </li>
                 <li>
-
-                    <em>Server side parsing</em>:
-                    <ul>
-                        <li>meaning that the user's speech input will be parsed at the server level using one of the many tools Google Cloud has</li>
-                        <li>anytime the user tries to use the speech input, his input will be sent to the server and the server will turn it into a text</li>
-                        <li>
-                            now that the server has the speech input from the user as a text, the text can be parsed just like a normal typed input
-                        </li>
-                        <li> after this the server will return back to the user the path and the body according to his initial request </li>
-                        <li>this approach can have better results, due to the fact the Google Cloud tools for speech recognition are very accurate</li>
-                        <li>however the user will not be able to see how his speech was converted to text</li>
-                        <li>a solution for the above drawback is to return to the user, the text resulted from his speech translation</li>
-                    </ul>
-                </li>
-
+                    Send the recording to <a href="https://cloud.google.com/speech-to-text">Google Cloud Speech-To-Text</a> service;
+                 </li>
+                 <li>
+                     Use the text returned as the text <en>typed</en> by our user in incoming steps;
+                 </li>
             </ol>
-            </p>
         </section>
         <section>
             <h2>5. Rest API</h2>
             <p> &emsp; &emsp;
-                The following routes are available:
-                <ul>
-                    <li>
-                        <b>/apis</b> [POST]: creates a new Api entry in the database
-                    </li>
-                    <li>
-                        <b>/apis/{id}</b> [GET]: returns all data about the api with the given <em>id</em>
-                    </li>
-                    <li>
-                        <b>/apis/specifications</b> [GET]: lists all stored api specifications
-                    </li>
-                    <li>
-                        <b>/apis/:id/nlp-to-rest </b> [POST]: Translate a command given in natural language into a valid REST request
-                    </li>
-                </ul>
+                The following routes will be <em>necessary but not sufficient</em> for our project:
+            </p>
+            <ul>
+                <li>
+                    <b>POST /apis</b> - creates a new Api entry in the database.
+                </li>
+                <li>
+                    <b>GET /apis/{id}</b> - returns all data about the api with the given <em>id</em>. This endpoint will be used more internally.
+                </li>
+                <li>
+                    <b>GET /apis/specifications</b> - lists all stored api specifications. By specification, we mean all the data necessary to display
+                    the api in our frontend app: api's internal id, api's public url, api's OpenApi specification url and information about how we should
+                    authenticate to the respective api (ApiKey, Oauth2 or no authentication needed)
+                </li>
+                <li>
+                    <b>POST /apis/:id/nlp-to-rest </b> - Translate a command given in natural language into a valid REST request. The natural language text
+                    will represent the post's body. This text will be processed as described under <em>4. Natural Language Processing</em> with the help of
+                    <a href="https://cloud.google.com/natural-language">Google's Natural Language Processing API</a>. The api will respond with all the elements
+                    needed for the client application to create a valid REST request: <em>route</em>, <em>body</em>, <em>Rest verb</em> and <em>parameters</em>.
+                </li>
+            </ul>
+            <p> &emsp; &emsp;
+                More detail can be found in our <a href="https://github.com/Kropius/WADe-project/blob/main/documentation/OpenApi/openapi.yaml">OpenAPI Specification</a>.
+                Please use <a href="https://editor.swagger.io/">Swagger editor</a>  to read more easly.
             </p>
         </section>
         <section>
             <h2>6. Front-end</h2>
-            <p> &emsp; &emsp; The use will interact with a single-page application(SPA), built with React, CSS and
-                obviously JSX. </p>
-            <figure typeOf="sa:image" class="img-containter">
-                <div>
-                    <img src="rat-frontend.png" alt="Usecase diagram">
-                    <figcaption style="text-align: center;">Fig. 2: Front-end concept</figcaption>
-                </div>
+            <p> &emsp; &emsp; The use will interact with a single-page application(SPA), built with React or Angular. </p>
+            <figure typeOf="sa:image" class="ignore-margins">
+                <img src="../ArchitectureAndDesign/rat-frontend.png" alt="Frontend Design">
+                <figcaption style="text-align: center;">Fig. 2: Front-end concept</figcaption>
             </figure>
-            <p>&emsp; &emsp; However the above design will not be completely replicated. Our purpose and goal is to use
-                the library <a href="https://www.npmjs.com/package/@awsui/components-react">AWSUI</a>, built obviously
-                by Amazon. This library is also used in AWS console, and provides a collection of reusable and
-                responsive React components.</p>
+            <p>&emsp; &emsp; The design above is more of a guideline and might not be replicated perfectly. </p>
 
         </section>
         <section>
-
-        </section>
-        <h2>7. Bibliography</h2>
-        <p> &emsp; &emsp;
-            TBD
-        </p>
+            <h2>7. Bibliography</h2>
+            <p> &emsp; &emsp;
+                TBD
+            </p>
         </section>
 
     </article>

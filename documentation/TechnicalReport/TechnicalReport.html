@@ -65,11 +65,11 @@
                     be parsed and saved on the server side to facilitate future queries in natural language.</li>
                 <li><em>Choose an available API: </em> The user will select a certain API from the given list of previously
                     added APIs. The application will make the future translation based on this API.</li>
-                <li><em>Types a request: </em> The user can type any sentance he wants and the application will try to map
-                    it to a valid <em>route</em>, <em>body</em>, <em>Rest verb</em> and <em>parameters</em> </li>
+                <li><em>Types a request: </em> The user can type any sentence he wants and the application will try to map
+                    it to a valid <em>route</em>, <em>body</em>, <em>Rest verb</em> and <em>parameters</em>. </li>
                 <li><em>Uses speech recognition in order to send the request: </em> Similar to <em>Types a request</em> but
-                    this time, the user speak aloud his request and the application will transform the recording to text and
-                    then return a valid <em>route</em>, <em>body</em>, <em>Rest verb</em> and <em>parameters</em> </li>
+                    this time, the user speaks aloud his request and the application will transform the recording to text and
+                    then will return a valid <em>route</em>, <em>body</em>, <em>Rest verb</em> and <em>parameters</em>. </li>
             </ul>
         </section>
         <section>
@@ -87,7 +87,7 @@
             help us better decouple the logic between our endpoints while keeping costs at a minimum with the "pay as you go" approach of such services.
             We will be able to choose our programming language based on what that function needs to do (in example, python for NLP, NodeJs for CRUD operations
             on our noSql Database) without needing to setup a separate server for that language as well. One main drawback of this approach would be the 
-            "cold starts" that appear on log traffic but there are workarounds for that: some light weight languages and frameworks like NodeJs have a way smaller
+            "cold starts" that appear on log traffic but there are workarounds for that: some light weight languages and frameworks like NodeJs have way smaller
             cold starts than others like Java and if that's not enough we can always put in place a warmup system. In order to provide a common interface and url
             for all our functions, we will be using <a href="https://cloud.google.com/api-gateway">Google Cloud API Gateway</a>. This way we have a single point where
             we need to setup the authentication for our api and where we can check that everything specified in <a href="../OpenApi/openapi.yaml">our OpenAPI specification</a>
@@ -95,22 +95,22 @@
             </p>
             <p> &emsp; &emsp;
                 For storage we will be using <a href="https://cloud.google.com/firestore">Firestore</a>, Google Cloud's main NoSQL solution. We'll be going with noSql
-            because we have only one type of entities: apis; and we don't have any complex relationships between entities besides some child-parent relationships
+            because we have only one type of entities: apis; we don't have any complex relationships between entities besides some child-parent relationships
             (api-endpoints-attributes). Also, the change of one child doesn't need to be reflected in all of its other appearences so we don't have a need for normalisation.
             </p>
             <p> &emsp; &emsp;
                 We will also be using <a href="https://cloud.google.com/natural-language">Google Cloud Natural Language Processing API</a> and 
-            <a href="https://cloud.google.com/speech-to-text">Google Cloud Speech-To-Text API</a> as described in <em>"4. Natural Language Processing"</em>
-            and <em>4.1 Optional Preprocessing: Speech recognition</em> respectively.
+            <a href="https://cloud.google.com/speech-to-text">Google Cloud Speech-To-Text API</a> as described in <em><a href="#NLP">4. Natural Language Processing</a></em>
+            and <em><a href="#speechRecognition">4.1 Optional Preprocessing: Speech recognition</a></em> respectively.
             </p>
             <p> &emsp; &emsp;
-                We need only one page in our frontend app, so using SPA framework is an intuitive solution. We will be using Angular or React for that. Because of thei nature,
-            SPAs don't need computaion power for hosting so we are fine with using <a href="https://cloud.google.com/storage">Google Cloud Storage</a> in order to provide our
+                We need only one page in our frontend app, so using SPA framework is an intuitive solution. We will be using Angular or React for that. Because of their nature,
+            SPAs don't need computation power for hosting so we are fine with using <a href="https://cloud.google.com/storage">Google Cloud Storage</a> in order to provide our
             single <em>index.html</em> file and its dependencies to client browsers.
             </p>
         </section>
         <section>
-            <h2>4. Natural Language Processing</h2>
+            <h2 id="NLP">4. Natural Language Processing</h2>
             <p> &emsp; &emsp;
 				In order to facilitate text/voice interaction with our application, we decided to use Google Cloud’s Natural Language AI. 
 				This service will help with the sentence analysis and parsing, providing useful data that takes the program one step closer 
@@ -125,7 +125,7 @@
 				&emsp; &emsp;
 				The most useful functionality in our case is the syntax analysis, as it inspects the structure of the language. In other 
 				words, when the user writes a command in the form of a sentence and passes it to the Natural Language API, it is broken 
-				into tokens (words) which are returned along with detailed linguistic information: part of speech, morphology and most 
+				into tokens (words) which are returned along with detailed linguistic information: parts of speech, morphology and most 
 				importantly, dependency tree. 
 			</p>
 			<p>
@@ -197,9 +197,9 @@
                 <figcaption style="text-align: center;">Fig. 4: Google NLP - output example</figcaption>
             </figure>
 
-            <h3>4.1 Optional Preprocessing: <em>Speech recognition</em> </h3>
+            <h3 id="speechRecognition">4.1 Optional Preprocessing: <em>Speech recognition</em> </h3>
             <p>&emsp; &emsp;
-                A nice bonus would be to have speech recognition capabilities, meaning that user will be able
+                A nice bonus would be to have speech recognition capabilities, meaning that the user will be able
                 to use his voice in order to <em>type</em> his request.
 
                 In order to do this, we will have to:
@@ -226,7 +226,7 @@
                     <b>POST /apis</b> - creates a new Api entry in the database.
                 </li>
                 <li>
-                    <b>GET /apis/{id}</b> - returns all data about the api with the given <em>id</em>. This endpoint will be used more internally.
+                    <b>GET /apis/{id}</b> - returns all data about the api with the given <em>id</em>. This endpoint cannot be used directly by users.
                 </li>
                 <li>
                     <b>GET /apis/specifications</b> - lists all stored api specifications. By specification, we mean all the data necessary to display
@@ -234,23 +234,23 @@
                     authenticate to the respective api (ApiKey, Oauth2 or no authentication needed)
                 </li>
                 <li>
-                    <b>POST /apis/:id/nlp-to-rest </b> - Translate a command given in natural language into a valid REST request. The natural language text
-                    will represent the post's body. This text will be processed as described under <em>4. Natural Language Processing</em> with the help of
+                    <b>POST /apis/{id}/nlp-to-rest </b> - Translate a command given in natural language into a valid REST request. The natural language text
+                    will represent the post's body. This text will be processed as described under <em><a href="#NLP">4. Natural Language Processing</a></em> with the help of
                     <a href="https://cloud.google.com/natural-language">Google's Natural Language Processing API</a>. The api will respond with all the elements
                     needed for the client application to create a valid REST request: <em>route</em>, <em>body</em>, <em>Rest verb</em> and <em>parameters</em>.
                 </li>
             </ul>
             <p> &emsp; &emsp;
-                More detail can be found in our <a href="https://github.com/Kropius/WADe-project/blob/main/documentation/OpenApi/openapi.yaml">OpenAPI Specification</a>.
-                Please use <a href="https://editor.swagger.io/">Swagger editor</a>  to read more easly.
+                More details can be found in our <a href="https://github.com/Kropius/WADe-project/blob/main/documentation/OpenApi/openapi.yaml">OpenAPI Specification</a>.
+                Please use <a href="https://editor.swagger.io/">Swagger editor</a>  to read more easily.
             </p>
         </section>
         <section>
             <h2>6. Front-end</h2>
-            <p> &emsp; &emsp; The use will interact with a single-page application(SPA), built with React or Angular. </p>
+            <p> &emsp; &emsp; The user will interact with a single-page application(SPA), built with React or Angular. </p>
             <figure typeOf="sa:image" class="ignore-margins">
                 <img src="../ArchitectureAndDesign/rat-frontend-highlighted.png" alt="Frontend Design">
-                <figcaption style="text-align: center;">Fig. 2: Front-end concept</figcaption>
+                <figcaption style="text-align: center;">Fig. 5: Front-end concept</figcaption>
             </figure>
             <p>&emsp; &emsp;
                 The design above is more of a guideline and might not be replicated perfectly. Highlited we have short explanations for each ui element

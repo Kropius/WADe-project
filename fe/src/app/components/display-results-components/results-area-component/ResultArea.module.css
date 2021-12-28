@@ -1,0 +1,10 @@
+.container{
+    /*max-height: 75vh;*/
+    /*position: relative;*/
+    height: 60vh;
+    max-height: 75vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+
+}

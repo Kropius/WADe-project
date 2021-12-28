@@ -1,0 +1,23 @@
+.right {
+    align-self: end !important;
+    background: #0084ff;
+    color: #fff;
+}
+
+.left {
+
+    align-self: start !important;
+    background: #eee;
+    float: left;
+}
+
+
+
+.bubble {
+    border-radius: 10px;
+    margin: 5px;
+    padding: 10px;
+    display: inline-block;
+    max-width: 20vw;
+    align-self: end;
+}

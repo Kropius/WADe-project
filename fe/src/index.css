@@ -1,0 +1,29 @@
+html{
+    max-height: 100vh;
+    width: 100vw;
+}
+body{
+    justify-content: center;
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    /*max-width: 100vw;*/
+    /*min-width: 100vw;*/
+    /*max-height: 100vh;*/
+    /*min-height: 100vh;*/
+    /*height: 100vh;*/
+    /*max-width: calc(100vw - 75px);*/
+}
+#root{
+    /*width: 100%;*/
+    /*position: absolute;*/
+    /*justify-content: center;*/
+    /*align-items: center;*/
+    /*max-height: 100vh;*/
+    /*min-height: 100vh;*/
+    /*height: 100vh;*/
+    width: calc(100vw - 75px);;
+    max-width: calc(100vw - 75px);
+    /*min-width: calc(100vw - 75px);*/
+
+}

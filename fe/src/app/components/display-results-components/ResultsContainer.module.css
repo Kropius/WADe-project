@@ -1,0 +1,13 @@
+.header {
+    /*min-width: 10vw !important;*/
+    /*width: 26vw !important;*/
+    display: flex;
+    flex-direction: row;
+    flex: 0 0 100%;
+    gap: 2vw;
+    justify-content: space-between;
+}
+.lastItem{
+    margin-left: auto !important;
+    color: #0084ff;
+}

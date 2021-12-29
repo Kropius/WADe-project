@@ -11,8 +11,6 @@
     float: left;
 }
 
-
-
 .bubble {
     border-radius: 10px;
     margin: 5px;
@@ -20,4 +18,12 @@
     display: inline-block;
     max-width: 20vw;
     align-self: end;
+}
+
+.responseBody{
+background:  #272822;
+}
+.invalid{
+    background: #ff8080;
+    border: 2px solid #ff1a1a;
 }

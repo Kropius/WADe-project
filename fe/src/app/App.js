@@ -1,28 +1,25 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import InputComponent from "./components/input-components/InputComponent";
-import {Grid, SpaceBetween} from "@awsui/components-react";
-import "swagger-ui-react/swagger-ui.css"
+import { Grid, SpaceBetween } from "@awsui/components-react";
+import "swagger-ui-react/swagger-ui.css";
 import AppCss from "./App.module.css";
 import ApiComponent from "./components/api-selection-component/ApiComponent";
 import ResultsContainer from "./components/display-results-components/ResultsContainer";
 
 const App = () => {
-    const [newRequest, setNewRequest] = useState({message: "", isRequest: true});
-    console.log(newRequest);
+    const [newRequest, setNewRequest] = useState({ message: "", isRequest: true });
+
     return (
         <div className={AppCss.app}>
-            <Grid gridDefinition={[{colspan: 4}, {colspan: 8}]}>
+            <Grid gridDefinition={[{ colspan: 4 }, { colspan: 8 }]}>
                 <SpaceBetween size={"m"}>
-                    <InputComponent setNewRequest={setNewRequest}/>
-                    <ResultsContainer newRequest = {newRequest}/>
+                    <InputComponent setNewRequest={setNewRequest} />
+                    <ResultsContainer newRequest={newRequest} />
                 </SpaceBetween>
 
-                <ApiComponent/>
+                <ApiComponent />
             </Grid>
-
         </div>
-
-
-    )
-}
+    );
+};
 export default App;

@@ -12,12 +12,15 @@ language_client = language_v1.LanguageServiceClient()
 text_type = language_v1.Document.Type.PLAIN_TEXT
 
 language = "en"
-text_content = "i want to visualise all gluten-free products"
+text_content = "show me red, angry cats with big muscles"
 document = {"content": text_content, "type_": text_type, "language": language}
+encoding_type = language_v1.EncodingType.UTF8
+response = language_client.analyze_syntax(request={'document': document, 'encoding_type': encoding_type})
+# print(response)
 
 get_synonyms = ['get', 'retrieve', 'acquire', 'obtain', 'read', 'show', 'view']
 post_synonyms = ['create', 'insert', 'add', 'append', 'write']
-put_synonyms = ['replace', 'change']
+put_synonyms = ['replace']
 patch_synonyms = ['update', 'improve']
 delete_synonyms = ['remove', 'delete', 'kill', 'reduce']
 
@@ -33,23 +36,18 @@ patch_verb_representatives = reduce(append_lists_lambda, [wordnet.synsets(word) 
 delete_verb_representatives = reduce(append_lists_lambda, [wordnet.synsets(word) for word in delete_synonyms])
 
 
-encoding_type = language_v1.EncodingType.UTF8
-
-response = language_client.analyze_syntax(request={'document': document, 'encoding_type': encoding_type})
-
-
 def find_http_verb(nlp_response):
     verb_list = []
-    for token in nlp_response.tokens:
+    for index, token in enumerate(nlp_response.tokens):
         if token.part_of_speech.tag.name == 'VERB':
-            verb_list.append(token.text.content)
+            verb_list.append((index, token.text.content))
 
     max_similarity = 0
     content_verb = verb_list[0]
     http_verb = 'GET'
 
     for candidate_verb in verb_list:
-        candidate_verb_representatives = wordnet.synsets(candidate_verb)
+        candidate_verb_representatives = wordnet.synsets(candidate_verb[1])
 
         for candidate_verb_representative in candidate_verb_representatives:
             for get_verb_representative in get_verb_representatives:
@@ -87,8 +85,80 @@ def find_http_verb(nlp_response):
                     content_verb = candidate_verb
                     http_verb = 'DELETE'
 
-    print(max_similarity)
     return content_verb, http_verb
 
 
+def find_main_entity(nlp_response, valid_entities, http_verb_index):
+    entity_list = []
+    for index, token in enumerate(nlp_response.tokens):
+        if token.dependency_edge.label.name == 'ROOT':
+            continue
+        if token.dependency_edge.head_token_index == http_verb_index and token.part_of_speech.tag.name == 'NOUN':
+            entity_list.append((index, token.text.content))
+
+    max_similarity = 0
+    entity_correspondent = entity_list[0]
+    real_entity_name = valid_entities[0]
+
+    for entity in entity_list:
+        candidate_entity_synset = wordnet.synsets(entity[1])[0]
+        for valid_entity in valid_entities:
+            valid_entity_synset = wordnet.synsets(valid_entity)[0]
+            current_similarity = candidate_entity_synset.wup_similarity(valid_entity_synset)
+            if current_similarity > max_similarity:
+                max_similarity = current_similarity
+                entity_correspondent = entity
+                real_entity_name = valid_entity
+
+    if max_similarity < 0.5:
+        raise Exception('Unfortunatelly, no entity matched your input!')
+    return entity_correspondent, real_entity_name
+
+
+def recursive_find_noun_attributes(nlp_response, dependency_index):
+    noun_attributes = []
+    for index, token in enumerate(nlp_response.tokens):
+        if token.dependency_edge.head_token_index == dependency_index:
+            if token.part_of_speech.tag.name == 'NOUN':
+                noun_attributes.append((index, token.text.content))
+            noun_attributes = noun_attributes + recursive_find_noun_attributes(nlp_response, index)
+    return noun_attributes
+
+
+def find_attribute_names(nlp_response, valid_attributes, entity_index):
+    real_attribute_list = []
+    values_list = []
+    for index, token in enumerate(nlp_response.tokens):
+        if token.dependency_edge.head_token_index == entity_index and token.part_of_speech.tag.name == 'ADJ':
+            values_list.append((index, token.text.content))
+
+    sentence_attributes = values_list + recursive_find_noun_attributes(nlp_response, entity_index)
+
+    for attribute in sentence_attributes:
+        attribute_synset = wordnet.synsets(attribute[1])[0]
+        max_similarity = 0
+        real_attribute_name = valid_attributes[0]
+        for valid_attribute in valid_attributes:
+            valid_attribute_synset = wordnet.synsets(valid_attribute)[0]
+            current_similarity = attribute_synset.wup_similarity(valid_attribute_synset)
+            if current_similarity > max_similarity:
+                max_similarity = current_similarity
+                real_attribute_name = valid_attribute
+        real_attribute_list.append(real_attribute_name)
+
+    return sentence_attributes, real_attribute_list, values_list
+
+
+entities = ['animal', 'weapon', 'human', 'store']
+attributes = ['color', 'muscle', 'mood']
+
+print('Main Sentence: ' + text_content)
+print('\nMatched HTTP Verb: ')
 print(find_http_verb(response))
+print('\nFrom entity list: ' + str(entities) + ', I Matched Entity: ')
+main_entity = find_main_entity(response, entities, 0)
+print(main_entity)
+print('\nFrom attribute list: ' + str(attributes), ', I matched attributes: ')
+print(find_attribute_names(response, attributes, main_entity[0][0]))
+
+print(wordnet.synsets('mood')[0].wup_similarity(wordnet.synsets('happy')[0]))

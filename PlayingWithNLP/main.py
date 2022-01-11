@@ -12,7 +12,7 @@ language_client = language_v1.LanguageServiceClient()
 text_type = language_v1.Document.Type.PLAIN_TEXT
 
 language = "en"
-text_content = "show me red, angry cats with big muscles"
+text_content = "Update the cat that has id 6 with black fur"
 document = {"content": text_content, "type_": text_type, "language": language}
 encoding_type = language_v1.EncodingType.UTF8
 response = language_client.analyze_syntax(request={'document': document, 'encoding_type': encoding_type})
@@ -135,30 +135,57 @@ def find_attribute_names(nlp_response, valid_attributes, entity_index):
     sentence_attributes = values_list + recursive_find_noun_attributes(nlp_response, entity_index)
 
     for attribute in sentence_attributes:
-        attribute_synset = wordnet.synsets(attribute[1])[0]
+        attribute_synsets = wordnet.synsets(attribute[1])
         max_similarity = 0
         real_attribute_name = valid_attributes[0]
         for valid_attribute in valid_attributes:
-            valid_attribute_synset = wordnet.synsets(valid_attribute)[0]
-            current_similarity = attribute_synset.wup_similarity(valid_attribute_synset)
-            if current_similarity > max_similarity:
-                max_similarity = current_similarity
-                real_attribute_name = valid_attribute
+            valid_attribute_synsets = wordnet.synsets(valid_attribute)
+            for attribute_synset in attribute_synsets:
+                for valid_attribute_synset in valid_attribute_synsets:
+                    current_similarity = attribute_synset.wup_similarity(valid_attribute_synset)
+                    if current_similarity > max_similarity:
+                        max_similarity = current_similarity
+                        real_attribute_name = valid_attribute
         real_attribute_list.append(real_attribute_name)
 
     return sentence_attributes, real_attribute_list, values_list
 
 
-entities = ['animal', 'weapon', 'human', 'store']
-attributes = ['color', 'muscle', 'mood']
+def find_rest_of_attribute_values(nlp_response, sentence_attributes, found_values):
+    unmapped_attributes = sentence_attributes[len(found_values):]
+    all_values = found_values
+    for attribute in unmapped_attributes:
+        for index, token in enumerate(nlp_response.tokens):
+            if token.dependency_edge.head_token_index == attribute[0] and \
+                    (token.part_of_speech.tag.name == 'ADJ' or token.part_of_speech.tag.name == 'NUM'):
+                all_values.append((index, token.text.content))
+    return all_values
+
+
+def get_final_result(verb, entity, attribute_names, values):
+    path = '/' + entity
+    query_params = '?'
+    for index, attribute in enumerate(attribute_names):
+        query_params += attribute + '=' + values[index][1] + '&'
+    query_params = query_params[:-1]
+    return verb + ' on ' + path + query_params
+
+
+entities = ['feline', 'weapon', 'human', 'store']
+attributes = ['feeling', 'color', 'muscle', 'id', 'members', 'gender']
 
 print('Main Sentence: ' + text_content)
 print('\nMatched HTTP Verb: ')
-print(find_http_verb(response))
+matched_verb = find_http_verb(response)
+print(matched_verb)
 print('\nFrom entity list: ' + str(entities) + ', I Matched Entity: ')
-main_entity = find_main_entity(response, entities, 0)
+main_entity = find_main_entity(response, entities, matched_verb[0][0])
 print(main_entity)
 print('\nFrom attribute list: ' + str(attributes), ', I matched attributes: ')
-print(find_attribute_names(response, attributes, main_entity[0][0]))
-
-print(wordnet.synsets('mood')[0].wup_similarity(wordnet.synsets('happy')[0]))
+attribute_search_result = find_attribute_names(response, attributes, main_entity[0][0])
+print(attribute_search_result)
+print('\nAttribute values: ')
+all_attribute_values = find_rest_of_attribute_values(response, attribute_search_result[0], attribute_search_result[2])
+print(all_attribute_values)
+print('\n')
+print(get_final_result(matched_verb[1], main_entity[1], attribute_search_result[1], all_attribute_values))

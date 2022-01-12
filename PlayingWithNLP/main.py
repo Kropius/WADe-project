@@ -7,36 +7,41 @@ from functools import reduce
 # nltk.download('wordnet')
 # nltk.download('omw-1.4')
 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'avid-airway-337117-d28d91542407.json'
-language_client = language_v1.LanguageServiceClient()
-text_type = language_v1.Document.Type.PLAIN_TEXT
 
-language = "en"
-text_content = "Update the cat that has id 6 with black fur"
-document = {"content": text_content, "type_": text_type, "language": language}
-encoding_type = language_v1.EncodingType.UTF8
-response = language_client.analyze_syntax(request={'document': document, 'encoding_type': encoding_type})
-# print(response)
+def initialize_data(text_content, text_type, language_client):
+    nlp_response = get_new_nlp_response(text_content, text_type, language_client)
 
-get_synonyms = ['get', 'retrieve', 'acquire', 'obtain', 'read', 'show', 'view']
-post_synonyms = ['create', 'insert', 'add', 'append', 'write']
-put_synonyms = ['replace']
-patch_synonyms = ['update', 'improve']
-delete_synonyms = ['remove', 'delete', 'kill', 'reduce']
+    get_synonyms = ['get', 'retrieve', 'acquire', 'obtain', 'read', 'show', 'view']
+    post_synonyms = ['create', 'insert', 'add', 'append', 'write']
+    put_synonyms = ['replace']
+    patch_synonyms = ['update', 'improve']
+    delete_synonyms = ['remove', 'delete', 'kill', 'reduce']
 
+    def append_lists_lambda(x, y):
+        return x + y
 
-def append_lists_lambda(x, y):
-    return x + y
+    get_verb_representatives = reduce(append_lists_lambda, [wordnet.synsets(word) for word in get_synonyms])
+    post_verb_representatives = reduce(append_lists_lambda, [wordnet.synsets(word) for word in post_synonyms])
+    put_verb_representatives = reduce(append_lists_lambda, [wordnet.synsets(word) for word in put_synonyms])
+    patch_verb_representatives = reduce(append_lists_lambda, [wordnet.synsets(word) for word in patch_synonyms])
+    delete_verb_representatives = reduce(append_lists_lambda, [wordnet.synsets(word) for word in delete_synonyms])
 
-
-get_verb_representatives = reduce(append_lists_lambda, [wordnet.synsets(word) for word in get_synonyms])
-post_verb_representatives = reduce(append_lists_lambda, [wordnet.synsets(word) for word in post_synonyms])
-put_verb_representatives = reduce(append_lists_lambda, [wordnet.synsets(word) for word in put_synonyms])
-patch_verb_representatives = reduce(append_lists_lambda, [wordnet.synsets(word) for word in patch_synonyms])
-delete_verb_representatives = reduce(append_lists_lambda, [wordnet.synsets(word) for word in delete_synonyms])
+    return nlp_response, get_verb_representatives, post_verb_representatives, put_verb_representatives, \
+        patch_verb_representatives, delete_verb_representatives
 
 
-def find_http_verb(nlp_response):
+def get_new_nlp_response(text_content, text_type, language_client):
+    language = "en"
+    if text_content[-1] not in ['.', '!', '?']:
+        text_content += '.'
+    document = {"content": text_content, "type_": text_type, "language": language}
+    encoding_type = language_v1.EncodingType.UTF8
+    response = language_client.analyze_syntax(request={'document': document, 'encoding_type': encoding_type})
+    return response
+
+
+def find_http_verb(nlp_response, get_verb_representatives, post_verb_representatives,
+                   put_verb_representatives, patch_verb_representatives, delete_verb_representatives):
     verb_list = []
     for index, token in enumerate(nlp_response.tokens):
         if token.part_of_speech.tag.name == 'VERB':
@@ -163,29 +168,62 @@ def find_rest_of_attribute_values(nlp_response, sentence_attributes, found_value
 
 
 def get_final_result(verb, entity, attribute_names, values):
+    response_dict = dict()
     path = '/' + entity
-    query_params = '?'
-    for index, attribute in enumerate(attribute_names):
-        query_params += attribute + '=' + values[index][1] + '&'
-    query_params = query_params[:-1]
-    return verb + ' on ' + path + query_params
+    response_dict['verb'] = verb
+    response_dict['path'] = path
+    if verb in ['GET', 'DELETE']:
+        query_params = '?'
+        for index, attribute in enumerate(attribute_names):
+            query_params += attribute + '=' + values[index][1] + '&'
+        query_params = query_params[:-1]
+        response_dict['query_params'] = query_params
+    else:
+        request_body = dict()
+        for index, attribute in enumerate(attribute_names):
+            request_body[attribute] = values[index][1]
+        response_dict['request_body'] = request_body
+
+    return response_dict
 
 
-entities = ['feline', 'weapon', 'human', 'store']
-attributes = ['feeling', 'color', 'muscle', 'id', 'members', 'gender']
+def main():
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'avid-airway-337117-d28d91542407.json'
+    language_client = language_v1.LanguageServiceClient()
+    text_type = language_v1.Document.Type.PLAIN_TEXT
 
-print('Main Sentence: ' + text_content)
-print('\nMatched HTTP Verb: ')
-matched_verb = find_http_verb(response)
-print(matched_verb)
-print('\nFrom entity list: ' + str(entities) + ', I Matched Entity: ')
-main_entity = find_main_entity(response, entities, matched_verb[0][0])
-print(main_entity)
-print('\nFrom attribute list: ' + str(attributes), ', I matched attributes: ')
-attribute_search_result = find_attribute_names(response, attributes, main_entity[0][0])
-print(attribute_search_result)
-print('\nAttribute values: ')
-all_attribute_values = find_rest_of_attribute_values(response, attribute_search_result[0], attribute_search_result[2])
-print(all_attribute_values)
-print('\n')
-print(get_final_result(matched_verb[1], main_entity[1], attribute_search_result[1], all_attribute_values))
+    entities = ['feline', 'weapon', 'human', 'store', 'bug']
+    attributes = ['feeling', 'color', 'muscle', 'id', 'members', 'force', 'gender']
+
+    text_content = 'Get cats with black fur'
+    response, get_verb_repr, post_verb_repr, put_verb_repr, \
+        patch_verb_repr, delete_verb_repr = initialize_data(text_content, text_type, language_client)
+
+    print('Main Sentence: ' + text_content)
+
+    print('\nMatched HTTP Verb: ')
+    matched_verb = find_http_verb(response, get_verb_repr, post_verb_repr,
+                                  put_verb_repr, patch_verb_repr, delete_verb_repr)
+    print(matched_verb)
+
+    if matched_verb[1] == 'GET' and 'with' in text_content:
+        text_content = text_content.replace('with', 'having')
+        response = get_new_nlp_response(text_content, text_type, language_client)
+
+    print('\nFrom entity list: ' + str(entities) + ', I Matched Entity: ')
+    main_entity = find_main_entity(response, entities, matched_verb[0][0])
+    print(main_entity)
+
+    print('\nFrom attribute list: ' + str(attributes), ', I matched attributes: ')
+    attribute_search_result = find_attribute_names(response, attributes, main_entity[0][0])
+    print(attribute_search_result)
+
+    print('\nAttribute values: ')
+    all_attribute_values = find_rest_of_attribute_values(response, attribute_search_result[0], attribute_search_result[2])
+    print(all_attribute_values)
+
+    print('\n')
+    print(get_final_result(matched_verb[1], main_entity[1], attribute_search_result[1], all_attribute_values))
+
+
+main()

@@ -195,7 +195,7 @@ def main():
     entities = ['feline', 'weapon', 'human', 'store', 'bug']
     attributes = ['feeling', 'color', 'muscle', 'id', 'members', 'force', 'gender']
 
-    text_content = 'Get cats with black fur'
+    text_content = 'Show me all happy cats with black color.'
     response, get_verb_repr, post_verb_repr, put_verb_repr, \
         patch_verb_repr, delete_verb_repr = initialize_data(text_content, text_type, language_client)
 
@@ -216,6 +216,10 @@ def main():
 
     print('\nFrom attribute list: ' + str(attributes), ', I matched attributes: ')
     attribute_search_result = find_attribute_names(response, attributes, main_entity[0][0])
+    for index, elem in enumerate(attribute_search_result[0]):
+        if elem[1] == main_entity[0][1]:
+            del attribute_search_result[0][index]
+            del attribute_search_result[1][index]
     print(attribute_search_result)
 
     print('\nAttribute values: ')

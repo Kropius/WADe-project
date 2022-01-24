@@ -5,3 +5,13 @@ This repo represents the implementation for [RAT WADe Project](https://profs.inf
 ## [Midterm Deliverables—Design & Architecture](https://github.com/Kropius/WADe-project/tree/main/documentation)
 ## Tags
 #project #infoiasi #wade #web
+
+### Team Notes:
+- Run a function locally: go to its folder (Below, `PostApiSpecifiaction`) and run:
+```
+functions-framework --target post_api --debug
+```
+- Deploy a function: go to its folder (Below, `PostApiSpecifiaction`) and run:
+```
+gcloud functions deploy postApi --trigger-http --runtime python39 --region europe-west1
+```

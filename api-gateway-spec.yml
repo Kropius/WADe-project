@@ -1,0 +1,288 @@
+swagger: '2.0'
+info:
+  title: wade-rat-mihtei-rezciopan WADE-RAT|Mihtei-Rezciopan
+  description: |+
+    ### Tell REST what to do and take a rest
+
+    This file represents the OpenAPI 3.0 specification of the [RAT WADe Project](https://profs.info.uaic.ro/~busaco/teach/courses/wade/projects/index.html) of Fall 2021 made by Cioata Matei-Alexandru, Lipan Radu-Matei, Rezmerita Mihnea-Ioan. More information on what this api helps to achive can be found in the link attached.
+
+    The list below represents a necessary but not sufficient list of REST routes neccesar to create a tool which allows interacting with a REST API using natural language. The list will be updated as the project evolves.
+  version: 1.0.0
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "key"
+    in: "query"
+schemes:
+  - https
+produces:
+  - application/json
+paths:
+  /apis:
+    options:
+      operationId: apisOptions
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/postApi
+      security:
+      - api_key: []
+      responses:
+        '200':
+          description: A successful response
+    post:
+      tags:
+      - Apis
+      summary: Creates a new Api entry in our database
+      operationId: postApi
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/postApi
+      security:
+      - api_key: []
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/ApiSpecification"
+      responses:
+        201:
+          description: Created
+          schema: {}
+        409:
+          description: Conflict
+          schema: 
+            $ref: "#/definitions/Error"
+        412:
+          description: Precondition Failed
+          schema: 
+            $ref: "#/definitions/Error"
+  /apis/{id}:
+    options:
+      operationId: apisIdOptions
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/getApi
+      security:
+      - api_key: []
+      responses:
+        '200':
+          description: A successful response
+    get:
+      tags:
+      - Apis
+      summary: Get all data about a stored Api
+      operationId: getApi
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/getApi
+      security:
+      - api_key: []
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+      responses:
+        200:
+          description: Ok
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Api"
+        404:
+          description: Not Found
+          schema: 
+            $ref: "#/definitions/Error"
+  /apis/specifications:
+    options:
+      operationId: apisSpecificationsOptions
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/listApis
+      security:
+      - api_key: []
+      responses:
+        '200':
+          description: A successful response
+    get:
+      tags:
+      - Apis
+      summary: Lists all stored api specifications
+      operationId: listApis
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/listApis
+      security:
+      - api_key: []
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: Ok
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/ApiSpecification"
+  /apis/{id}/nlp-to-rest:
+    options:
+      operationId: apisIdNlpToRestOptions
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/nlpToRest
+      security:
+      - api_key: []
+      responses:
+        '200':
+          description: A successful response
+    post:
+      tags:
+      - Apis
+      summary: Translate a command given in natural language into a valid REST request
+      operationId: nlpToRest
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/nlpToRest
+      security:
+      - api_key: []
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Id of specification used while translating"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "text_content"
+        required: true
+        description: Natural language text to be transformed into a valid REST request for the API specified
+        schema:
+          type: object
+          properties:
+            text:
+              type: string
+      responses:
+        200:
+          description: Ok
+          schema: 
+            $ref: "#/definitions/RestRequest"
+        412:
+          description: Precondition Failed
+          schema: 
+            $ref: "#/definitions/Error"
+        404:
+          description: Not Found
+          schema: 
+            $ref: "#/definitions/Error"
+definitions:
+  Api:
+    type: object
+    properties:
+      id:
+        type: string
+      url:
+        type: string
+      openApiSpecificationUrl:
+        type: string
+      authenticationType:
+        type: string
+        enum: [None, ApiKey, OAuth]
+      credentials:
+        type: array
+        items:
+          $ref: "#/definitions/Dictionary"
+      endpoints:
+        type: array
+        items:
+          type: object
+          properties:
+            verb:
+              type: string
+              enum: [GET, POST, PUT, PATCH, DELETE]
+            path:
+              type: string
+            body:
+              type: object
+            entity:
+              type: string
+            attributes:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  paramName:
+                    type: string
+                  paramType:
+                    type: string
+                    enum: [Query, Body, Path]
+  Dictionary:
+    type: object
+    properties:
+      key:
+        type: "string"
+      value:
+        type: "string"
+  RestRequest:
+    type: object
+    properties:
+      verb:
+        type: string
+      url:
+        type: string
+      headers:
+        type: array
+        items:
+          $ref: "#/definitions/Dictionary"
+      body:
+        type: string
+  Error:
+    type: object
+    properties:
+      status:
+        type: "string"
+      type:
+        type: "string"
+      message:
+        type: "string"
+  ApiSpecification:
+    type: object
+    properties:
+      id:
+        type: string
+      url:
+        type: string
+      openApiSpecification:
+        type: string

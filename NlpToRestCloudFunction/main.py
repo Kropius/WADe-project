@@ -2,10 +2,8 @@ import os
 from google.cloud import language_v1
 from nltk.corpus import wordnet
 from functools import reduce
-
-# import nltk
-# nltk.download('wordnet')
-# nltk.download('omw-1.4')
+import functions_framework
+import nltk.data
 
 
 def initialize_data(text_content, text_type, language_client):
@@ -26,8 +24,57 @@ def initialize_data(text_content, text_type, language_client):
     patch_verb_representatives = reduce(append_lists_lambda, [wordnet.synsets(word) for word in patch_synonyms])
     delete_verb_representatives = reduce(append_lists_lambda, [wordnet.synsets(word) for word in delete_synonyms])
 
+    api_spec_data = {
+        'allowed_operations': {
+            'GET': [
+                'feline',
+                'store'
+            ],
+            'POST': [
+                'weapon'
+            ],
+            'PUT': [
+                'feline',
+                'weapon',
+                'human'
+            ],
+            'PATCH': [
+                'feline'
+            ],
+            'DELETE': [
+                'bug',
+                'feline',
+                'human'
+            ],
+        },
+        'allowed_attributes': {
+            'feline': [
+                'id',
+                'feeling',
+                'color',
+                'muscle',
+                'members'
+            ],
+            'weapon': [
+                'id',
+                'force',
+                'color'
+            ],
+            'human': [
+                'id',
+                'gender'
+            ],
+            'bug': [
+                'id',
+                'feeling',
+                'color',
+                'members'
+            ]
+        }
+    }
+
     return nlp_response, get_verb_representatives, post_verb_representatives, put_verb_representatives, \
-        patch_verb_representatives, delete_verb_representatives
+        patch_verb_representatives, delete_verb_representatives, api_spec_data
 
 
 def get_new_nlp_response(text_content, text_type, language_client):
@@ -94,6 +141,7 @@ def find_http_verb(nlp_response, get_verb_representatives, post_verb_representat
 
 
 def find_main_entity(nlp_response, valid_entities, http_verb_index):
+    error_entity_not_found = False
     entity_list = []
     for index, token in enumerate(nlp_response.tokens):
         if token.dependency_edge.label.name == 'ROOT':
@@ -102,6 +150,7 @@ def find_main_entity(nlp_response, valid_entities, http_verb_index):
             entity_list.append((index, token.text.content))
 
     max_similarity = 0
+    # TODO: Check if there is at least 1 verb and 1 noun in the sentence and throw 412 if not
     entity_correspondent = entity_list[0]
     real_entity_name = valid_entities[0]
 
@@ -115,9 +164,9 @@ def find_main_entity(nlp_response, valid_entities, http_verb_index):
                 entity_correspondent = entity
                 real_entity_name = valid_entity
 
-    if max_similarity < 0.5:
-        raise Exception('Unfortunatelly, no entity matched your input!')
-    return entity_correspondent, real_entity_name
+    if max_similarity < 0.6:
+        error_entity_not_found = True
+    return (entity_correspondent, real_entity_name), error_entity_not_found
 
 
 def recursive_find_noun_attributes(nlp_response, dependency_index):
@@ -187,17 +236,29 @@ def get_final_result(verb, entity, attribute_names, values):
     return response_dict
 
 
-def main():
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'avid-airway-337117-d28d91542407.json'
+def post(request):
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    print('Root dir: ' + root_dir)
+    nltk_dir = os.path.join(root_dir, 'nltk_data')
+    nltk.data.path.append(nltk_dir)
+
+    response_headers = {
+        'Access-Control-Allow-Origin': '*'
+    }
+
     language_client = language_v1.LanguageServiceClient()
     text_type = language_v1.Document.Type.PLAIN_TEXT
-
-    entities = ['feline', 'weapon', 'human', 'store', 'bug']
-    attributes = ['feeling', 'color', 'muscle', 'id', 'members', 'force', 'gender']
-
     text_content = 'Show me all happy cats with black color.'
+
+    request_json = request.get_json()
+    if request_json and 'text_content' in request_json:
+        print('From function: ' + request_json['text_content'])
+        text_content = request_json['text_content']
+    if request.args and request.args.get('id'):
+        print('From function: ' + str(request.args.get('id')))
+
     response, get_verb_repr, post_verb_repr, put_verb_repr, \
-        patch_verb_repr, delete_verb_repr = initialize_data(text_content, text_type, language_client)
+        patch_verb_repr, delete_verb_repr, parsed_api_spec = initialize_data(text_content, text_type, language_client)
 
     print('Main Sentence: ' + text_content)
 
@@ -210,12 +271,23 @@ def main():
         text_content = text_content.replace('with', 'having')
         response = get_new_nlp_response(text_content, text_type, language_client)
 
-    print('\nFrom entity list: ' + str(entities) + ', I Matched Entity: ')
-    main_entity = find_main_entity(response, entities, matched_verb[0][0])
+    supported_entities_for_found_verb = parsed_api_spec['allowed_operations'][matched_verb[1]]
+    print('\nFrom entity list: ' + str(supported_entities_for_found_verb) + ', I matched entity: ')
+    main_entity_search_result = find_main_entity(response, supported_entities_for_found_verb, matched_verb[0][0])
+    main_entity = main_entity_search_result[0]
+    error_finding_entity = main_entity_search_result[1]
+    if error_finding_entity:
+        error_response_body = {
+            'message': 'The highest similarity between the provided entity ' + main_entity[0][1].upper() +
+                       ' and any of the supported API entities is too small OR the matched verb ' +
+                       matched_verb[1] + ' does not operate with the entity: ' + main_entity[0][1].upper() + '!'
+        }
+        return error_response_body, 412, response_headers
     print(main_entity)
 
-    print('\nFrom attribute list: ' + str(attributes), ', I matched attributes: ')
-    attribute_search_result = find_attribute_names(response, attributes, main_entity[0][0])
+    supported_attributes_for_found_entity = parsed_api_spec['allowed_attributes'][main_entity[1]]
+    print('\nFrom attribute list: ' + str(supported_attributes_for_found_entity), ', I matched attributes: ')
+    attribute_search_result = find_attribute_names(response, supported_attributes_for_found_entity, main_entity[0][0])
     for index, elem in enumerate(attribute_search_result[0]):
         if elem[1] == main_entity[0][1]:
             del attribute_search_result[0][index]
@@ -226,8 +298,33 @@ def main():
     all_attribute_values = find_rest_of_attribute_values(response, attribute_search_result[0], attribute_search_result[2])
     print(all_attribute_values)
 
+    final_result = get_final_result(matched_verb[1], main_entity[1], attribute_search_result[1], all_attribute_values)
     print('\n')
-    print(get_final_result(matched_verb[1], main_entity[1], attribute_search_result[1], all_attribute_values))
+    print(final_result)
+
+    return final_result, 200, response_headers
 
 
-main()
+def options(request):
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'OPTIONS,POST',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Max-Age': '3600'
+    }
+
+    return '', 204, headers
+
+
+@functions_framework.errorhandler(NotImplementedError)
+def handle_method_not_allowed(e):
+    return "Method not allowed", 405
+
+
+@functions_framework.http
+def nlp_to_rest(request):
+    if request.method == 'OPTIONS':
+        return options(request)
+    if request.method == 'POST':
+        return post(request)
+    raise NotImplementedError()

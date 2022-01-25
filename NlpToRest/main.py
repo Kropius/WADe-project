@@ -94,6 +94,9 @@ def find_http_verb(nlp_response, get_verb_representatives, post_verb_representat
         if token.part_of_speech.tag.name == 'VERB':
             verb_list.append((index, token.text.content))
 
+    if len(verb_list) == 0:
+        return '', ''
+
     max_similarity = 0
     content_verb = verb_list[0]
     http_verb = 'GET'
@@ -137,11 +140,14 @@ def find_http_verb(nlp_response, get_verb_representatives, post_verb_representat
                     content_verb = candidate_verb
                     http_verb = 'DELETE'
 
+    if max_similarity == 0:
+        return '', ''
+
     return content_verb, http_verb
 
 
 def find_main_entity(nlp_response, valid_entities, http_verb_index):
-    error_entity_not_found = False
+    error_entity_not_amongst_valid_ones = False
     entity_list = []
     for index, token in enumerate(nlp_response.tokens):
         if token.dependency_edge.label.name == 'ROOT':
@@ -149,13 +155,17 @@ def find_main_entity(nlp_response, valid_entities, http_verb_index):
         if token.dependency_edge.head_token_index == http_verb_index and token.part_of_speech.tag.name == 'NOUN':
             entity_list.append((index, token.text.content))
 
+    if len(entity_list) == 0:
+        return ('', ''), error_entity_not_amongst_valid_ones
+
     max_similarity = 0
-    # TODO: Check if there is at least 1 verb and 1 noun in the sentence and throw 412 if not
     entity_correspondent = entity_list[0]
     real_entity_name = valid_entities[0]
 
     for entity in entity_list:
-        candidate_entity_synset = wordnet.synsets(entity[1])[0]
+        candidate_entity_synset = wordnet.synsets(entity[1])[0] if len(wordnet.synsets(entity[1])) > 0 else None
+        if candidate_entity_synset is None:
+            continue
         for valid_entity in valid_entities:
             valid_entity_synset = wordnet.synsets(valid_entity)[0]
             current_similarity = candidate_entity_synset.wup_similarity(valid_entity_synset)
@@ -165,8 +175,8 @@ def find_main_entity(nlp_response, valid_entities, http_verb_index):
                 real_entity_name = valid_entity
 
     if max_similarity < 0.6:
-        error_entity_not_found = True
-    return (entity_correspondent, real_entity_name), error_entity_not_found
+        error_entity_not_amongst_valid_ones = True
+    return (entity_correspondent, real_entity_name), error_entity_not_amongst_valid_ones
 
 
 def recursive_find_noun_attributes(nlp_response, dependency_index):
@@ -266,6 +276,11 @@ def post(request):
     matched_verb = find_http_verb(response, get_verb_repr, post_verb_repr,
                                   put_verb_repr, patch_verb_repr, delete_verb_repr)
     print(matched_verb)
+    if matched_verb == ('', ''):
+        error_response_body = {
+            'message': 'Please provide at least one valid VERB in your sentence!'
+        }
+        return error_response_body, 412, response_headers
 
     if matched_verb[1] == 'GET' and 'with' in text_content:
         text_content = text_content.replace('with', 'having')
@@ -284,6 +299,11 @@ def post(request):
         }
         return error_response_body, 412, response_headers
     print(main_entity)
+    if main_entity == ('', ''):
+        error_response_body = {
+            'message': 'Please provide at least one valid NOUN in your sentence!'
+        }
+        return error_response_body, 412, response_headers
 
     supported_attributes_for_found_entity = parsed_api_spec['allowed_attributes'][main_entity[1]]
     print('\nFrom attribute list: ' + str(supported_attributes_for_found_entity), ', I matched attributes: ')

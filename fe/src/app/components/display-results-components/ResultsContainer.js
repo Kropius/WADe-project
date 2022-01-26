@@ -4,10 +4,9 @@ import Header from "@awsui/components-react/header";
 import ResultsArea from "./results-area-component/ResultArea";
 import Button from "@awsui/components-react/button";
 
-const ResultsContainer = ({ newRequest }) => {
+const ResultsContainer = ({ newRequest, setIsLoading }) => {
     const ref = useRef(null);
     const clearMessages = () => {
-        console.log(ref.current);
         ref.current.setMessages([]);
     };
     return (
@@ -21,7 +20,7 @@ const ResultsContainer = ({ newRequest }) => {
                 </Header>
             }
         >
-            <ResultsArea newRequest={newRequest} ref={ref} />
+            <ResultsArea newRequest={newRequest} ref={ref} setIsLoading={setIsLoading}/>
         </Container>
     );
 };

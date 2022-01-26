@@ -3,36 +3,43 @@ import MessageStyle from "./Message.module.css";
 import isEmpty from "lodash/isEmpty";
 import JSONPretty from "react-json-pretty";
 import JSONPrettyMon from "react-json-pretty/dist/monikai";
+import CallArea from "../CallArea";
 
 const ResponseMessage = ({message}) => {
-    const [dataToBeDisplayed, setDataToBeDisplayed] = useState(null);
+    const [requestData, setRequestData] = useState(null);
+    const [requestBody, setRequestBody] = useState(null);
 
     useEffect(() => {
-        try {
-            setDataToBeDisplayed(JSON.parse(message));
-            console.log(JSON.parse(message));
-        } catch (e) {
-            console.log(e);
-            setDataToBeDisplayed(null);
-        }
-    }, [message])
+        setRequestBody(message?.request_body);
+        const requestData = {
+            path: message?.path ?? "N/A",
+            verb: message?.verb ?? "N/A",
+            queryParams: message?.query_params ?? "N/A"
+        };
+        setRequestData(requestData);
+    }, [message]);
     return ([
-            !isEmpty(dataToBeDisplayed?.path) ?
-                <code className={`${MessageStyle.bubble} ${MessageStyle.right}`}>{dataToBeDisplayed?.path}</code> :
-                <code className={`${MessageStyle.bubble} ${MessageStyle.right} ${MessageStyle.invalid}`}>No path
-                    provided</code>
+                <div className={`${MessageStyle.bubble} ${MessageStyle.right} ${MessageStyle.requestBody}`}
+                     key="requestData">
+                    <JSONPretty data={requestData} theme={JSONPrettyMon}></JSONPretty>
+                </div>,
 
-            ,
-            !isEmpty(dataToBeDisplayed?.responseBody) ?
-                <div className={`${MessageStyle.bubble} ${MessageStyle.responseBody} ${MessageStyle.right}`}>
-                    <JSONPretty data={dataToBeDisplayed?.responseBody} theme={JSONPrettyMon}></JSONPretty>
-                </div> :
-                <code className={`${MessageStyle.bubble} ${MessageStyle.right} ${MessageStyle.invalid}`}>No response
-                    body
-                    provided</code>
+
+                <div className={`${MessageStyle.bubble} ${MessageStyle.requestBody} ${MessageStyle.right}`}
+                     key="requestBody">
+                    <JSONPretty data={{requestBody: isEmpty(requestBody) ? "N/A" : requestBody}}
+                                theme={JSONPrettyMon}></JSONPretty>
+                </div>,
+            <div className={`${MessageStyle.right}`}
+                 key={`call-area-${requestBody}-${requestData}`}>
+                <CallArea
+                          />
+            </div>
+
+
         ]
 
-    )
+    );
 };
 
 export default ResponseMessage;

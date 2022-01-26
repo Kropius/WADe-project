@@ -6,10 +6,13 @@ import SpaceBetween from "@awsui/components-react/space-between";
 import Input from "@awsui/components-react/input";
 import Button from "@awsui/components-react/button";
 import Dictaphone from "./Dictatophone";
+import {FormField, Spinner} from "@awsui/components-react";
 
 
-const InputComponent = ({setNewRequest}) => {
+const InputComponent = ({setNewRequest, isLoading}) => {
     const [value, setValue] = React.useState("");
+
+
     return (
         <Box>
             <Container header={<Header>Type/Record your request</Header>}>
@@ -18,14 +21,25 @@ const InputComponent = ({setNewRequest}) => {
                         value={value}
                         onChange={(event) => setValue(event.detail.value)}
                     />
-                    <SpaceBetween size="m" direction="horizontal">
-                        <Button variant="primary" onClick={() => setNewRequest({message: value, isRequest: true})}>Get
-                            results</Button>
-                        <Dictaphone handleInputChange={setValue} text="Talk"/>
-                    </SpaceBetween>
+                    <FormField>
+                        <SpaceBetween size="m" direction="horizontal">
+                            <Button variant="primary" onClick={() => setNewRequest({message: value, isRequest: true})}>
+                                <SpaceBetween size={"m"} direction={"horizontal"}>
+                                    <div>
+                                        Get
+                                    results
+                                    </div>
+                                    {isLoading ? <Spinner size={"normal"}/> : null}
+                                </SpaceBetween>
+
+                            </Button>
+                            <Dictaphone handleInputChange={setValue} text="Talk"/>
+                        </SpaceBetween>
+                    </FormField>
+
                 </SpaceBetween>
             </Container>
         </Box>
     );
-}
+};
 export default InputComponent;

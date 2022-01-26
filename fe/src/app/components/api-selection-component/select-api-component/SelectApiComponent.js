@@ -1,21 +1,10 @@
 import React, {useState} from "react";
 import {Select} from "@awsui/components-react";
 
+// eslint-disable-next-line no-unused-vars
 const SelectApi = ({options, selectionHandler}) => {
-    const mockedOptions = [{
-        "label": "Petstore",
-        "value": "pet-store",
-        "link": "https://petstore.swagger.io/v2/swagger.json"
-    }, {
-        "label": "WadeProject",
-        "value": "wade-project",
-        "link": "https://petstore.swagger.io/v2/swagger.json"
-    }, {
-        "label": "School API",
-        "value": "school",
-        "link": "https://petstore.swagger.io/v2/swagger.json"
-    }]
-    const [selectedOption, setSelectedOption] = useState(mockedOptions[0])
+
+    const [selectedOption, setSelectedOption] = useState(null);
 
     function onOptionChange(newSelectedOption) {
         setSelectedOption(newSelectedOption);
@@ -25,9 +14,9 @@ const SelectApi = ({options, selectionHandler}) => {
     return (
         <Select
             selectedOption={selectedOption}
-            options={mockedOptions}
+            options={options}
             onChange={({detail}) => onOptionChange(detail.selectedOption)}
         />
-    )
-}
+    );
+};
 export default SelectApi;

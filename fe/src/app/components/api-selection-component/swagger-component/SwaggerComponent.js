@@ -10,12 +10,12 @@ const SwaggerComponent = ({apiLink, title}) => {
         <Box>
             <Container header={<Header>{title}</Header>} className={SwaggerWidgetCSS.container}>
 
-                <SwaggerUI url={apiLink ?? "https://petstore.swagger.io/v2/swagger.json"}/>
+                <SwaggerUI url={apiLink}/>
 
             </Container>
         </Box>
 
-    )
+    );
 
-}
+};
 export default SwaggerComponent;

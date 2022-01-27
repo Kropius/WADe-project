@@ -1,9 +1,4 @@
-import os
 from google.cloud import datastore
-
-BUCKET_NAME = "open_api_v3_specifications"
-
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'avid-airway-337117-d28d91542407.json'
 
 
 def put(_id, body):
@@ -14,6 +9,7 @@ def put(_id, body):
 
     for key in body.keys():
         fields[key] = body[key]
+    fields['id'] = _id
 
     datastore_client.put(fields)
 

@@ -1,9 +1,12 @@
 import functions_framework
+import os
 
-from exceptions.precondition_failed_exception import PreconditionFailedException
 from adaptors import gcloud_storage_adapter, gcloud_datastore_adapter
 from extractors import extractor
 from parsers import parser
+
+
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'avid-airway-337117-d28d91542407.json'
 
 
 def options(_):
@@ -35,15 +38,10 @@ def post(request):
     return "", 201, headers
 
 
-@functions_framework.errorhandler(PreconditionFailedException)
-def precondition_failed(e):
-    return str(e), 412
-
-
 @functions_framework.http
 def post_api(request):
     if request.method == 'OPTIONS':
         return options(request)
     if request.method == 'POST':
         return post(request)
-    raise ZeroDivisionError()
+    return "{} is not supported on this endpoint".format(request.method), 405

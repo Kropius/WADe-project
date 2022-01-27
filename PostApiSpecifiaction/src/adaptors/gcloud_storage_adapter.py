@@ -1,9 +1,6 @@
-import os
 from google.cloud import storage
 
 BUCKET_NAME = "open_api_v3_specifications"
-
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'avid-airway-337117-d28d91542407.json'
 
 
 def put(body, path):

@@ -1,4 +1,11 @@
+import json
+
 import functions_framework
+import os
+
+from adaptors import gcloud_datastore_adapter
+
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'avid-airway-337117-d28d91542407.json'
 
 
 def options(request):
@@ -12,23 +19,22 @@ def options(request):
     return '', 204, headers
 
 
-def post(request):
+def query(request):
     headers = {
         'Access-Control-Allow-Origin': '*'
     }
 
-    return "Hello world!", 200, headers
+    response = {
+        "apis": gcloud_datastore_adapter.query()
+    }
+
+    return json.dumps(response), 200, headers
 
 
-@functions_framework.errorhandler(ZeroDivisionError)
-def handle_zero_division(e):
-    return "I'm a teapot", 418
-
-
-@functions_framework.http
-def get_api(request):
+@functions_framework.http("/apis")
+def list_apis(request):
     if request.method == 'OPTIONS':
         return options(request)
     if request.method == 'GET':
-        return post(request)
-    raise ZeroDivisionError()
+        return query(request)
+    return "{} is not supported on this endpoint".format(request.method), 405

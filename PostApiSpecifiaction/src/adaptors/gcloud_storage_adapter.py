@@ -10,4 +10,4 @@ def put(body, path):
 
     blob.upload_from_string(body)
 
-    return "https://storage.cloud.google.com/{}/{}".format(BUCKET_NAME, path)
+    return "https://storage.googleapis.com/{}/{}".format(BUCKET_NAME, path)

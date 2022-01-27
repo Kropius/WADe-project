@@ -20,6 +20,8 @@ def validate_all_fields_exist(body):
 
 def validate_spec_is_json(spec):
     try:
+        if '\\n' in spec:
+            raise Exception
         json.loads(spec)
     except Exception:
         raise PreconditionFailedException("open_api_specification is not a valid json.")

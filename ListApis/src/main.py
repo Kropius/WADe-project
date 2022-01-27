@@ -21,7 +21,8 @@ def options(request):
 
 def query(request):
     headers = {
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
     }
 
     response = {
@@ -31,10 +32,30 @@ def query(request):
     return json.dumps(response), 200, headers
 
 
+@functions_framework.errorhandler(NotImplementedError)
+def handle_405(e):
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+    }
+
+    return json.dumps({"message": "Method not allowed"}), 405, headers
+
+
+@functions_framework.errorhandler(Exception)
+def handle_500(e):
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+    }
+
+    return json.dumps({"message": "Something went wrong. Please try again..."}), 500, headers
+
+
 @functions_framework.http
 def list_apis(request):
     if request.method == 'OPTIONS':
         return options(request)
     if request.method == 'GET':
         return query(request)
-    return "{} is not supported on this endpoint".format(request.method), 405
+    raise NotImplementedError

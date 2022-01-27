@@ -63,6 +63,26 @@ paths:
           description: Precondition Failed
           schema: 
             $ref: "#/definitions/Error"
+    get:
+      tags:
+        - Apis
+      summary: Lists all stored api specifications
+      operationId: listApis
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/listApis
+      security:
+        - api_key: [ ]
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: Ok
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/ApiSpecification"
   /apis/{id}:
     options:
       operationId: apisIdOptions
@@ -111,40 +131,6 @@ paths:
           description: Not Found
           schema: 
             $ref: "#/definitions/Error"
-  /apis/specifications:
-    options:
-      operationId: apisSpecificationsOptions
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      x-google-backend:
-        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/listApis
-      security:
-      - api_key: []
-      responses:
-        '200':
-          description: A successful response
-    get:
-      tags:
-      - Apis
-      summary: Lists all stored api specifications
-      operationId: listApis
-      x-google-backend:
-        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/listApis
-      security:
-      - api_key: []
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      responses:
-        200:
-          description: Ok
-          schema:
-            type: array
-            items:
-              $ref: "#/definitions/ApiSpecification"
   /apis/{id}/nlp-to-rest:
     options:
       operationId: apisIdNlpToRestOptions

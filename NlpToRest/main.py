@@ -1,4 +1,5 @@
 import os
+import json
 from google.cloud import language_v1
 from nltk.corpus import wordnet
 from functools import reduce
@@ -253,7 +254,8 @@ def post(request):
     nltk.data.path.append(nltk_dir)
 
     response_headers = {
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
     }
 
     language_client = language_v1.LanguageServiceClient()
@@ -337,8 +339,23 @@ def options(request):
 
 
 @functions_framework.errorhandler(NotImplementedError)
-def handle_method_not_allowed(e):
-    return "Method not allowed", 405
+def handle_405(e):
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+    }
+
+    return json.dumps({"message": "Method not allowed"}), 405, headers
+
+
+@functions_framework.errorhandler(Exception)
+def handle_500(e):
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+    }
+
+    return json.dumps({"message": "Something went wrong. Please try again..."}), 500, headers
 
 
 @functions_framework.http

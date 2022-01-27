@@ -24,7 +24,7 @@ def get(request):
         'Access-Control-Allow-Origin': '*'
     }
 
-    url_elems = request.url.strip('/').split('/')
+    url_elems = request.url.split('?')[0].strip('/').split('/')
     _id = url_elems[-1]
     check = url_elems[-2]
     domain = url_elems[-3]

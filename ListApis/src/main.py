@@ -31,7 +31,7 @@ def query(request):
     return json.dumps(response), 200, headers
 
 
-@functions_framework.http("/apis")
+@functions_framework.http
 def list_apis(request):
     if request.method == 'OPTIONS':
         return options(request)

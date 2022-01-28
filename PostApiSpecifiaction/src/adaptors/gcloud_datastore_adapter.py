@@ -9,7 +9,6 @@ def put(_id, body):
 
     for key in body.keys():
         fields[key] = body[key]
-    fields['id'] = _id
 
     datastore_client.put(fields)
 

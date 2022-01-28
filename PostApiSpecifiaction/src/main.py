@@ -14,7 +14,7 @@ os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'avid-airway-337117-d28d91542407.
 def options(_):
     headers = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'OPTIONS,POST',
+        'Access-Control-Allow-Methods': 'OPTIONS,GET,POST',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Max-Age': '3600'
     }
@@ -35,10 +35,11 @@ def post(request):
     spec_url = gcloud_storage_adapter.put(path=_id, body=open_api_specification)
 
     body['spec_url'] = spec_url
+    body['id'] = _id
 
     gcloud_datastore_adapter.put(_id=_id, body=body)
 
-    return "", 201, headers
+    return json.dumps(body), 201, headers
 
 
 @functions_framework.errorhandler(NotImplementedError)

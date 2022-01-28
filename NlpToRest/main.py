@@ -4,10 +4,12 @@ from google.cloud import language_v1
 from nltk.corpus import wordnet
 from functools import reduce
 import functions_framework
+import constants
+import requests
 import nltk.data
 
 
-def initialize_data(text_content, text_type, language_client):
+def initialize_data(text_content, api_spec_id, text_type, language_client):
     nlp_response = get_new_nlp_response(text_content, text_type, language_client)
 
     get_synonyms = ['get', 'retrieve', 'acquire', 'obtain', 'read', 'show', 'view']
@@ -25,54 +27,18 @@ def initialize_data(text_content, text_type, language_client):
     patch_verb_representatives = reduce(append_lists_lambda, [wordnet.synsets(word) for word in patch_synonyms])
     delete_verb_representatives = reduce(append_lists_lambda, [wordnet.synsets(word) for word in delete_synonyms])
 
+    api_spec_response = requests.get(constants.GET_SPEC_URL + str(api_spec_id) + '?key=' + constants.API_KEY)
+    api_spec_response_dict = api_spec_response.json()
+
     api_spec_data = {
-        'allowed_operations': {
-            'GET': [
-                'feline',
-                'store'
-            ],
-            'POST': [
-                'weapon'
-            ],
-            'PUT': [
-                'feline',
-                'weapon',
-                'human'
-            ],
-            'PATCH': [
-                'feline'
-            ],
-            'DELETE': [
-                'bug',
-                'feline',
-                'human'
-            ],
-        },
-        'allowed_attributes': {
-            'feline': [
-                'id',
-                'feeling',
-                'color',
-                'muscle',
-                'members'
-            ],
-            'weapon': [
-                'id',
-                'force',
-                'color'
-            ],
-            'human': [
-                'id',
-                'gender'
-            ],
-            'bug': [
-                'id',
-                'feeling',
-                'color',
-                'members'
-            ]
-        }
+        'allowed_operations': api_spec_response_dict['allowed_operations'],
+        'allowed_attributes': api_spec_response_dict['allowed_attributes']
     }
+
+    for entity, attribute_list in api_spec_data['allowed_attributes'].items():
+        api_spec_data['allowed_attributes'][entity] = list(set([list(attribute.keys())[0] for attribute in attribute_list]))
+
+    print(api_spec_data)
 
     return nlp_response, get_verb_representatives, post_verb_representatives, put_verb_representatives, \
         patch_verb_representatives, delete_verb_representatives, api_spec_data
@@ -260,17 +226,27 @@ def post(request):
 
     language_client = language_v1.LanguageServiceClient()
     text_type = language_v1.Document.Type.PLAIN_TEXT
-    text_content = 'Show me all happy cats with black color.'
 
     request_json = request.get_json()
     if request_json and 'text_content' in request_json:
         print('From function: ' + request_json['text_content'])
         text_content = request_json['text_content']
+    else:
+        error_response_body = {
+            'message': 'text_content attribute is missing from your request body!'
+        }
+        return error_response_body, 400, response_headers
     if request.args and request.args.get('id'):
         print('From function: ' + str(request.args.get('id')))
+        api_spec_id = request.args.get('id')
+    else:
+        error_response_body = {
+            'message': 'The API Specification ID is missing from the path params!'
+        }
+        return error_response_body, 400, response_headers
 
     response, get_verb_repr, post_verb_repr, put_verb_repr, \
-        patch_verb_repr, delete_verb_repr, parsed_api_spec = initialize_data(text_content, text_type, language_client)
+        patch_verb_repr, delete_verb_repr, parsed_api_spec = initialize_data(text_content, api_spec_id, text_type, language_client)
 
     print('Main Sentence: ' + text_content)
 

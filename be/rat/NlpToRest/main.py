@@ -27,7 +27,10 @@ def initialize_data(text_content, api_spec_id, text_type, language_client):
     patch_verb_representatives = reduce(append_lists_lambda, [wordnet.synsets(word) for word in patch_synonyms])
     delete_verb_representatives = reduce(append_lists_lambda, [wordnet.synsets(word) for word in delete_synonyms])
 
-    api_spec_response = requests.get(constants.GET_SPEC_URL + str(api_spec_id) + '?key=' + constants.API_KEY)
+    get_parsed_spec_header = {
+        'X-API-KEY': constants.API_KEY
+    }
+    api_spec_response = requests.get(constants.GET_SPEC_URL + str(api_spec_id), headers=get_parsed_spec_header)
     api_spec_response_dict = api_spec_response.json()
 
     api_spec_data = {
@@ -307,7 +310,7 @@ def options(request):
     headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'OPTIONS,POST',
-        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Headers': 'Content-Type,X-API-KEY',
         'Access-Control-Max-Age': '3600'
     }
 

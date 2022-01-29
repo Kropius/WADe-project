@@ -1,7 +1,6 @@
 import React, {useState} from "react";
 import {Select} from "@awsui/components-react";
 
-// eslint-disable-next-line no-unused-vars
 const SelectApi = ({options, selectionHandler}) => {
 
     const [selectedOption, setSelectedOption] = useState(null);

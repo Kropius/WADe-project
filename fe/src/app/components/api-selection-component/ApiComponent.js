@@ -19,7 +19,8 @@ const ApiComponent = () => {
     return (
         <SpaceBetween size="l" direction="vertical">
             <SelectionComponent handleApiSelection={setSelectedSpecification}
-                                options={appState?.specifications?.specifications}/>
+                                options={appState?.specifications?.specifications}
+                                loadSpecifications = {loadSpecifications}/>
             <SwaggerComponent apiLink={appState?.selectedSpecification?.link}
                               title={appState?.selectedSpecification?.label ?? "No specification selected"} />
         </SpaceBetween>

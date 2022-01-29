@@ -4,21 +4,27 @@ import UploadFile from "./UploadFileComponent";
 import Header from "@awsui/components-react/header";
 import Container from "@awsui/components-react/container";
 import Grid from "@awsui/components-react/grid";
+import Button from "@awsui/components-react/button";
+import {SpaceBetween} from "@awsui/components-react";
 
-const SelectionComponent = ({options, handleApiSelection}) => {
-
+// eslint-disable-next-line no-unused-vars
+const SelectionComponent = ({options, handleApiSelection, loadSpecifications}) => {
     return (
-        <div>
-            <Container header={<Header>Select/Upload you api!</Header>}>
-                <Grid gridDefinition={[{colspan: 6}, {colspan: 6}]}
-                      direction="horizontal"
-                >
-                    <SelectApi selectionHandler={handleApiSelection} options={options}/>
-                    <UploadFile/>
-                </Grid>
-            </Container>
+        <Container header={<Header><SpaceBetween size={"m"} direction={"horizontal"}>Select/Upload you api!
+            <Button iconAlign={"right"} iconName={"refresh"} onClick={loadSpecifications}>
+                Refresh</Button></SpaceBetween> </Header>}>
 
-        </div>
+            <Grid gridDefinition={[{colspan: 6}, {colspan: 6}]}
+                  direction="horizontal"
+            >
+                <SelectApi selectionHandler={handleApiSelection} options={options}/>
+                <UploadFile/>
+            </Grid>
+        </Container>
+
+
     );
+
 };
+
 export default SelectionComponent;

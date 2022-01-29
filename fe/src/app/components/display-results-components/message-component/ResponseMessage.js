@@ -3,9 +3,9 @@ import MessageStyle from "./Message.module.css";
 import isEmpty from "lodash/isEmpty";
 import JSONPretty from "react-json-pretty";
 import JSONPrettyMon from "react-json-pretty/dist/monikai";
-import CallArea from "../CallArea";
+import CallArea from "../call-area-components/CallArea";
 
-const ResponseMessage = ({message}) => {
+const ResponseMessage = ({message, selectedApi}) => {
     const [requestData, setRequestData] = useState(null);
     const [requestBody, setRequestBody] = useState(null);
 
@@ -18,6 +18,7 @@ const ResponseMessage = ({message}) => {
         };
         setRequestData(requestData);
     }, [message]);
+
     return ([
                 <div className={`${MessageStyle.bubble} ${MessageStyle.right} ${MessageStyle.requestBody}`}
                      key="requestData">
@@ -32,8 +33,8 @@ const ResponseMessage = ({message}) => {
                 </div>,
             <div className={`${MessageStyle.right}`}
                  key={`call-area-${requestBody}-${requestData}`}>
-                <CallArea
-                          />
+                <CallArea requestBody={requestBody} path={requestData?.path}
+                          queryParams={requestData?.queryParams} selectedApi={selectedApi} verb={requestData?.verb}/>
             </div>
 
 

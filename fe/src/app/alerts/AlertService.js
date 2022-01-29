@@ -8,15 +8,46 @@ const AlertService = () => {
                                                     alerts:[]}
     );
     const handleNetworkErrors = (msg, data) => {
+        console.log(data);
         return setState((prevState) =>{
-            const newAlert = buildAlert(data, "error", prevState.alertsCounter);
+            const newAlert = buildAlertError(data, "error", prevState.alertsCounter);
             return {...prevState,
             alertsCounter: prevState.alertsCounter + 1,
             alerts: [...prevState.alerts, newAlert]};
         } );
     };
 
-    function buildAlert(data, type, index){
+    const handleOpenApiResponse = (msg,data)=>{
+        return setState((prevState) =>{
+            const newAlert = buildInfoAlert(data, "info", prevState.alertsCounter);
+            return {...prevState,
+                alertsCounter: prevState.alertsCounter + 1,
+                alerts: [...prevState.alerts, newAlert]};
+        } );
+    };
+
+    const handleSuccess = (msg, data) =>{
+        return setState((prevState) =>{
+            const newAlert = buildInfoAlert(data, "Success", "success", prevState.alertsCounter);
+            return {...prevState,
+                alertsCounter: prevState.alertsCounter + 1,
+                alerts: [...prevState.alerts, newAlert]};
+        } );
+    };
+
+    function buildInfoAlert(data,title, type, index){
+        const alertId = `alert-${type}-${index}`;
+        return {
+            id: alertId,
+            header: "Response to request",
+            type: type,
+            content: data.toString(),
+            dismissible: true,
+            action: dismissByDefault(alertId),
+            onDismiss: () => dismissAlert(alertId)
+        };
+    }
+    function buildAlertError(data, type, index){
         const alertId = `alert-${type}-${index}`;
         return {
             id: alertId,
@@ -56,6 +87,8 @@ const AlertService = () => {
     useEffect(()=>
     {
         PubSub.subscribe("networkError", handleNetworkErrors);
+        PubSub.subscribe("openApiResponse", handleOpenApiResponse);
+        PubSub.subscribe("success", handleSuccess);
         return () => PubSub.unsubscribe("networkError");
     },[]);
 

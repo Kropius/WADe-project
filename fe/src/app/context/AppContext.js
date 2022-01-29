@@ -24,38 +24,27 @@ function AppContextProvider({children}){
 
     const loadSpecifications = useCallback(
         async() => {
-            console.log("executing load specifications");
             // eslint-disable-next-line no-unused-vars
             let receivedSpecifications = [];
-            const mockedOptions = [{
-                "label": "Petstore",
-                "value": "1",
-                "link": "https://petstore.swagger.io/v2/swagger.json"
-            }, {
-                "label": "WadeProject",
-                "value": "2",
-                "link": "https://raw.githubusercontent.com/Kropius/WADe-project/main/documentation/OpenApi/openapi.json"
-            }, {
-                "label": "School API",
-                "value": "3",
-                "link": "https://petstore.swagger.io/v2/swagger.json"
-            }];
-            await SpecificationApi().getSpecifications()
-                .then((fullResponse) =>receivedSpecifications = fullResponse?.data?.data)
-                .catch((error) => PubSub.publish("networkError",
-                    {title: "Problem while fetching specifications",error }));
 
-            console.log(receivedSpecifications);
+            await SpecificationApi().getSpecifications()
+                .then((fullResponse) =>receivedSpecifications =  mapReceivedSpecs(fullResponse))
+                .catch((error) => PubSub.publish("networkError",
+                    {title: "Problem while fetching specifications",error}));
+
             return dispatch({type: AppContextActions.LOAD_SPECIFICATIONS,
                 payload:
                     {specifications:
-                            {specifications: mockedOptions,
+                            {specifications: receivedSpecifications,
                                 hasLoaded: true}}});
         },[dispatch]
 
     );
 
-
+    function mapReceivedSpecs(fullResponse){
+        return fullResponse?.data?.apis?.map((receivedSpec)=>{
+           return  { label:receivedSpec?.id, value : receivedSpec?.id, link: receivedSpec?.spec_url};});
+    }
     const value = {
         appState,
         setSelectedSpecification,

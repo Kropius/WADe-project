@@ -7,11 +7,11 @@
   },
   "servers": [
     {
-      "url": "https://wade-rat-mihtei-rezciopan-crbqcods.ew.gateway.dev"
+      "url": "https://wade-bugs-cats-weapons-crbqcods.ew.gateway.dev"
     }
   ],
   "paths": {
-    "/bugsCatsWeapons/feline": {
+    "/feline": {
       "get": {
         "tags": [
 		  "cats"
@@ -378,7 +378,7 @@
         }
       }
     },
-	"/bugsCatsWeapons/bug": {
+	"/bug": {
       "delete": {
         "tags": [
 		  "bugs"
@@ -501,7 +501,7 @@
         }
       }
     },
-	"/bugsCatsWeapons/weapon": {
+	"/weapon": {
       "post": {
         "tags": [
 		  "weapons"

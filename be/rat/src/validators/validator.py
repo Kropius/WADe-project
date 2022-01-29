@@ -5,7 +5,12 @@ from openapi_spec_validator.exceptions import OpenAPIValidationError
 from openapi_spec_validator import validate_spec
 
 
-def validate(body):
+def validate_id(request):
+    if request.args.get('id') is None:
+        raise PreconditionFailedException("id was not provided.")
+
+
+def validate_api_spec(body):
     validate_all_fields_exist(body)
     validate_spec_is_json(body['open_api_specification'])
     validate_spec_is_open_api_v3(body['open_api_specification'])

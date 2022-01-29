@@ -1,66 +1,118 @@
 openapi: 3.0.1
 info:
-  title: RAT - WADe Project
-  description: |+
+  title: wade-rat-mihtei-rezciopan WADE-RAT|Mihtei-Rezciopan
+  description: |
     ### Tell REST what to do and take a rest
 
     This file represents the OpenAPI 3.0 specification of the [RAT WADe Project](https://profs.info.uaic.ro/~busaco/teach/courses/wade/projects/index.html) of Fall 2021 made by Cioata Matei-Alexandru, Lipan Radu-Matei, Rezmerita Mihnea-Ioan. More information on what this api helps to achive can be found in the link attached.
-    
-    The list below represents a necessary but not sufficient list of REST routes neccesar to create a tool which allows interacting with a REST API using natural language. The list will be updated as the project evolves.
 
+    The list below represents a necessary but not sufficient list of REST routes neccesar to create a tool which allows interacting with a REST API using natural language. The list will be updated as the project evolves.
   version: 1.0.0
 servers:
-- url: https://rat.wade.info.uaic.ro/api/v1
-security:
-- HeaderKey: []
+- url: https://wade-rat-mihtei-rezciopan-crbqcods.ew.gateway.dev
 paths:
   /apis:
+    get:
+      tags:
+      - Apis
+      summary: Lists all stored api specifications
+      operationId: apisQuery
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetApiBody'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Something went wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - api_key: []
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/apisEndpoint
     post:
       tags:
       - Apis
       summary: Creates a new Api entry in our database
-      operationId: postApi
+      operationId: apisPost
       requestBody:
-        description: Api specification to be processed and stored
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ApiSpecification"
+              $ref: '#/components/schemas/PostApiBody'
         required: true
       responses:
         201:
           description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetApiBody'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        412:
+          description: Precondition Failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Something went wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - api_key: []
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/apisEndpoint
+      x-codegen-request-body-name: body
+    options:
+      tags:
+      - Apis
+      operationId: apisOptions
+      responses:
+        204:
+          description: A successful response
           content: {}
         401:
           description: Unauthorized
           content:
             application/json:
-              schema: 
-                $ref: "#/components/schemas/Error"
-        409:
-          description: Conflict
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/Error"
-        412:
-          description: Precondition Failed
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/Error"
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
-          description: Server Error
+          description: Something went wrong
           content:
             application/json:
-              schema: 
-                $ref: "#/components/schemas/Error"
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - api_key: []
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/apisEndpoint
   /apis/{id}:
     get:
       tags:
       - Apis
       summary: Get all data about a stored Api
-      operationId: getApi
+      operationId: apiGet
       parameters:
       - name: id
         in: path
@@ -68,67 +120,86 @@ paths:
         schema:
           type: string
       responses:
-        200:
-          description: Ok
+        204:
+          description: A successful response
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Api"
+                $ref: '#/components/schemas/GetApiBody'
         401:
           description: Unauthorized
           content:
             application/json:
-              schema: 
-                $ref: "#/components/schemas/Error"
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
-          description: Not Found
+          description: Resource Not Found
           content:
             application/json:
-              schema: 
-                $ref: "#/components/schemas/Error"
+              schema:
+                $ref: '#/components/schemas/Error'
+        412:
+          description: Precondition Failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
-          description: Server Error
+          description: Something went wrong
           content:
             application/json:
-              schema: 
-                $ref: "#/components/schemas/Error"
-  /apis/specifications:
-    get:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - api_key: []
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/apiEndpoint
+    options:
       tags:
       - Apis
-      summary: Lists all stored api specifications
-      operationId: listApispecifications
+      operationId: apiOptions
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
-        200:
-          description: Ok
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ApiSpecification"
+        204:
+          description: A successful response
+          content: {}
         401:
           description: Unauthorized
           content:
             application/json:
-              schema: 
-                $ref: "#/components/schemas/Error"
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
-          description: Server Error
+          description: Something went wrong
           content:
             application/json:
-              schema: 
-                $ref: "#/components/schemas/Error"
-  /apis/:id/nlp-to-rest:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - api_key: []
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/apiEndpoint
+  /apis/{id}/nlp-to-rest:
     post:
       tags:
       - Apis
       summary: Translate a command given in natural language into a valid REST request
-      operationId: nlpToRest
+      operationId: apiNlpToRestPost
+      parameters:
+      - name: id
+        in: path
+        description: Id of specification used while translating
+        required: true
+        schema:
+          type: string
       requestBody:
-        description: Natural language text to be transformed into a valid REST request for the API specified
+        description: Natural language text to be transformed into a valid REST request
+          for the API specified
         content:
           application/json:
             schema:
@@ -142,93 +213,131 @@ paths:
           description: Ok
           content:
             application/json:
-              schema: 
-                $ref: "#/components/schemas/RestRequest"
+              schema:
+                $ref: '#/components/schemas/NlpToRestResponse'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         401:
           description: Unauthorized
           content:
             application/json:
-              schema: 
-                $ref: "#/components/schemas/Error"
-        412:
-          description: Precondition Failed
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/Error"
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
           description: Not Found
           content:
             application/json:
-              schema: 
-                $ref: "#/components/schemas/Error"
-        500:
-          description: Server Error
+              schema:
+                $ref: '#/components/schemas/Error'
+        412:
+          description: Precondition Failed
           content:
             application/json:
-              schema: 
-                $ref: "#/components/schemas/Error"
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Something went wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - api_key: []
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/nlpToRest
+      x-codegen-request-body-name: text_content
+    options:
+      tags:
+      - Apis
+      operationId: apiNlpToRestOptions
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        204:
+          description: A successful response
+          content: {}
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Something went wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - api_key: []
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/nlpToRest
 components:
   schemas:
-    Api:
+    PostApiBody:
+      type: object
+      properties:
+        id:
+          type: string
+        open_api_specification:
+          type: string
+    GetApiBody:
       type: object
       properties:
         id:
           type: string
         url:
           type: string
-        openApiSpecificationUrl:
+        open_api_specification:
           type: string
-        authenticationType:
-          type: string
-          enum: [None, ApiKey, OAuth]
-        credentials:
-          type: array
-          items:
-            $ref: "#/components/schemas/Dictionary"
-        endpoints:
+        allowed_operations:
+          type: object
+          properties:
+            DELETE:
+              type: array
+              items:
+                type: string
+            PATCH:
+              type: array
+              items:
+                type: string
+            POST:
+              type: array
+              items:
+                type: string
+            PUT:
+              type: array
+              items:
+                type: string
+            GET:
+              type: array
+              items:
+                type: string
+        allowed_attributes:
           type: array
           items:
             type: object
             properties:
-              verb:
-                type: string
-                enum: [GET, POST, PUT, PATCH, DELETE]
-              path:
-                type: string
-              body:
-                type: object
-              entity:
+              subject:
                 type: string
               attributes:
                 type: array
                 items:
                   type: object
                   properties:
-                    name:
+                    attribute:
                       type: string
-                    paramName:
+                    found_in:
                       type: string
-                    paramType:
-                      type: string
-                      enum: [Query, Body, Path]
-    Error:
-      type: object
-      properties:
-        status:
-          type: "string"
-        type:
-          type: "string"
-        message:
-          type: "string"
-    Dictionary:
-      type: object
-      properties:
-        key:
-          type: "string"
-        value:
-          type: "string"
-    RestRequest:
+    NlpToRestResponse:
       type: object
       properties:
         verb:
@@ -238,28 +347,25 @@ components:
         headers:
           type: array
           items:
-            $ref: "#/components/schemas/Dictionary"
+            $ref: '#/components/schemas/Dictionary'
         body:
           type: string
-    ApiSpecification:
+    Dictionary:
       type: object
       properties:
-        id:
+        key:
           type: string
-        url:
+        value:
           type: string
-        openApiSpecificationUrl:
+    Error:
+      type: object
+      properties:
+        code:
           type: string
-        authenticationType:
+        message:
           type: string
-          enum: [None, ApiKey, OAuth]
-        credentials:
-          type: array
-          items:
-            $ref: "#/components/schemas/Dictionary"
   securitySchemes:
-    HeaderKey:
+    api_key:
       type: apiKey
-      description: The RAT API Key will be used to check that the client application making the call to the API has access to do so.
-      name: X-RAT-Key
+      name: X-API-Key
       in: header

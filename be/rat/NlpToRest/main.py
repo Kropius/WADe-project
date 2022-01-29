@@ -321,7 +321,10 @@ def handle_405(e):
         'Content-Type': 'application/json'
     }
 
-    return json.dumps({"message": "Method not allowed"}), 405, headers
+    return json.dumps({
+        "message": "Method not allowed",
+        "code": 405
+    }), 405, headers
 
 
 @functions_framework.errorhandler(Exception)
@@ -331,7 +334,10 @@ def handle_500(e):
         'Content-Type': 'application/json'
     }
 
-    return json.dumps({"message": "Something went wrong. Please try again..."}), 500, headers
+    return json.dumps({
+        "message": "Something went wrong. Please try again...",
+        "code": 500
+    }), 500, headers
 
 
 @functions_framework.http

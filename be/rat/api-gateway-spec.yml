@@ -1,0 +1,341 @@
+swagger: '2.0'
+info:
+  title: wade-rat-mihtei-rezciopan WADE-RAT|Mihtei-Rezciopan
+  description: |+
+    ### Tell REST what to do and take a rest
+
+    This file represents the OpenAPI 3.0 specification of the [RAT WADe Project](https://profs.info.uaic.ro/~busaco/teach/courses/wade/projects/index.html) of Fall 2021 made by Cioata Matei-Alexandru, Lipan Radu-Matei, Rezmerita Mihnea-Ioan. More information on what this api helps to achive can be found in the link attached.
+
+    The list below represents a necessary but not sufficient list of REST routes neccesar to create a tool which allows interacting with a REST API using natural language. The list will be updated as the project evolves.
+  version: 1.0.0
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "X-API-Key"
+    in: "header"
+schemes:
+  - https
+produces:
+  - application/json
+paths:
+  /apis:
+    options:
+      tags:
+        - Apis
+      operationId: apisOptions
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/apisEndpoint
+      security:
+        - api_key: []
+      responses:
+        204:
+          description: A successful response
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: Something went wrong
+          schema:
+            $ref: "#/definitions/Error"
+    post:
+      tags:
+        - Apis
+      summary: Creates a new Api entry in our database
+      operationId: apisPost
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/apisEndpoint
+      security:
+        - api_key: []
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/PostApiBody"
+      responses:
+        201:
+          description: Created
+          schema:
+            $ref: "#/definitions/GetApiBody"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        412:
+          description: Precondition Failed
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: Something went wrong
+          schema:
+            $ref: "#/definitions/Error"
+    get:
+      tags:
+        - Apis
+      summary: Lists all stored api specifications
+      operationId: apisQuery
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/apisEndpoint
+      security:
+        - api_key: []
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: Ok
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/GetApiBody"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: Something went wrong
+          schema:
+            $ref: "#/definitions/Error"
+  /apis/{id}:
+    options:
+      tags:
+        - Apis
+      operationId: apiOptions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/apiEndpoint
+      security:
+        - api_key: []
+      responses:
+        204:
+          description: A successful response
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: Something went wrong
+          schema:
+            $ref: "#/definitions/Error"
+    get:
+      tags:
+        - Apis
+      summary: Get all data about a stored Api
+      operationId: apiGet
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/apiEndpoint
+      security:
+        - api_key: []
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      responses:
+        '204':
+          description: A successful response
+          schema:
+            $ref: "#/definitions/GetApiBody"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: Resource Not Found
+          schema:
+            $ref: "#/definitions/Error"
+        412:
+          description: Precondition Failed
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: Something went wrong
+          schema:
+            $ref: "#/definitions/Error"
+  /apis/{id}/nlp-to-rest:
+    options:
+      tags:
+        - Apis
+      operationId: apiNlpToRestOptions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/nlpToRest
+      security:
+        - api_key: []
+      responses:
+        204:
+          description: A successful response
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: Something went wrong
+          schema:
+            $ref: "#/definitions/Error"
+    post:
+      tags:
+        - Apis
+      summary: Translate a command given in natural language into a valid REST request
+      operationId: apiNlpToRestPost
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/nlpToRest
+      security:
+        - api_key: []
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "Id of specification used while translating"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "text_content"
+          required: true
+          description: Natural language text to be transformed into a valid REST request for the API specified
+          schema:
+            type: object
+            properties:
+              text:
+                type: string
+      responses:
+        200:
+          description: Ok
+          schema:
+            $ref: "#/definitions/NlpToRestResponse"
+        400:
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/Error"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: Not Found
+          schema:
+            $ref: "#/definitions/Error"
+        412:
+          description: Precondition Failed
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: Something went wrong
+          schema:
+            $ref: "#/definitions/Error"
+definitions:
+  PostApiBody:
+    type: object
+    properties:
+      id:
+        type: string
+      open_api_specification:
+        type: string
+  GetApiBody:
+    type: object
+    properties:
+      id:
+        type: string
+      url:
+        type: string
+      open_api_specification:
+        type: string
+      allowed_operations:
+        type: object
+        properties:
+          DELETE:
+            type: array
+            items:
+              type: string
+          PATCH:
+            type: array
+            items:
+              type: string
+          POST:
+            type: array
+            items:
+              type: string
+          PUT:
+            type: array
+            items:
+              type: string
+          GET:
+            type: array
+            items:
+              type: string
+      allowed_attributes:
+        type: array
+        items:
+          type: object
+          properties:
+            subject:
+              type: string
+            attributes:
+              type: array
+              items:
+                type: object
+                properties:
+                  attribute:
+                    type: string
+                  found_in:
+                    type: string
+  NlpToRestResponse:
+    type: object
+    properties:
+      verb:
+        type: string
+      url:
+        type: string
+      headers:
+        type: array
+        items:
+          $ref: "#/definitions/Dictionary"
+      body:
+        type: string
+  Dictionary:
+    type: object
+    properties:
+      key:
+        type: "string"
+      value:
+        type: "string"
+  Error:
+    type: object
+    properties:
+      code:
+        type: "string"
+      message:
+        type: "string"

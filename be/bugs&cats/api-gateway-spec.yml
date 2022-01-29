@@ -11,8 +11,8 @@ info:
 securityDefinitions:
   api_key:
     type: "apiKey"
-    name: "key"
-    in: "query"
+    name: "X-API-Key"
+    in: "header"
 schemes:
   - https
 produces:
@@ -30,7 +30,7 @@ paths:
       security:
       - api_key: []
       responses:
-        '200':
+        '204':
           description: A successful response
     post:
       tags:

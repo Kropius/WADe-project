@@ -12,7 +12,6 @@ def validate_id(request):
 
 def validate_api_spec(body):
     validate_all_fields_exist(body)
-    validate_spec_is_json(body['open_api_specification'])
     validate_spec_is_open_api_v3(body['open_api_specification'])
 
 
@@ -22,14 +21,6 @@ def validate_all_fields_exist(body):
             or 'open_api_specification' not in body:
         raise PreconditionFailedException("missing required field in body.")
 
-
-def validate_spec_is_json(spec):
-    try:
-        if '\\n' in spec:
-            raise Exception
-        json.loads(spec)
-    except Exception:
-        raise PreconditionFailedException("open_api_specification is not a valid json.")
 
 
 def validate_spec_is_open_api_v3(spec):

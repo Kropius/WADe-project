@@ -15,7 +15,7 @@ def options(methods):
     headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': methods,
-        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Headers': 'Content-Type,X-API-KEY',
         'Access-Control-Max-Age': '3600'
     }
 

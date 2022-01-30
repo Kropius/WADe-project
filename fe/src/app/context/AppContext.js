@@ -43,7 +43,8 @@ function AppContextProvider({children}){
 
     function mapReceivedSpecs(fullResponse){
         return fullResponse?.data?.apis?.map((receivedSpec)=>{
-           return  { label:receivedSpec?.id, value : receivedSpec?.id, link: receivedSpec?.spec_url};});
+           return  { label:receivedSpec?.id, value : receivedSpec?.id, link: receivedSpec?.spec_url,
+               url: receivedSpec?.url};});
     }
     const value = {
         appState,

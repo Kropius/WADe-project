@@ -14,7 +14,7 @@ const ResponseMessage = ({message, selectedApi}) => {
         const requestData = {
             path: message?.path ?? "N/A",
             verb: message?.verb ?? "N/A",
-            queryParams: message?.query_params ?? "N/A"
+            queryParams: isEmpty(message?.query_params) ? "N/A" : message?.query_params
         };
         setRequestData(requestData);
     }, [message]);
@@ -33,8 +33,11 @@ const ResponseMessage = ({message, selectedApi}) => {
                 </div>,
             <div className={`${MessageStyle.right}`}
                  key={`call-area-${requestBody}-${requestData}`}>
-                <CallArea requestBody={requestBody} path={requestData?.path}
-                          queryParams={requestData?.queryParams} selectedApi={selectedApi} verb={requestData?.verb}/>
+                <CallArea requestBody={requestBody}
+                          path={requestData?.path}
+                          queryParams={requestData?.queryParams}
+                          selectedApi={selectedApi}
+                          verb={requestData?.verb}/>
             </div>
 
 

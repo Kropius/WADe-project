@@ -28,28 +28,32 @@ const CallableApi = () =>{
             .catch(handleError);
     };
 
-    const post = async(path, resource, params) => {
+    const post = async(path, params, resource) => {
         return axios.post(path, resource, {
-            params
+            headers: headers,
+            params: params
         })
             .then(defaultSuccessHandler)
             .catch(handleError);
     };
 
-    const put = async(path, resource, params) => {
-        return axios.put(path,resource, {params})
+    const put = async(path, params, resource) => {
+        return axios.put(path,resource, {
+            headers: headers,
+            params:params
+        })
             .then(defaultSuccessHandler)
             .catch(handleError);
     };
 
-    const patch = async(path, resource, params) =>{
-        return axios.patch(path,resource, {params})
+    const patch = async(path, params, resource) =>{
+        return axios.patch(path,resource, {headers: headers, params: params})
             .then(defaultSuccessHandler)
             .catch(handleError);
     };
 
-    const Delete = async(path, resource, params) =>{
-        return axios.delete(path, {params})
+    const Delete = async(path, params) =>{
+        return axios.delete(path, {headers: headers, params: params})
             .then(defaultSuccessHandler)
             .catch(handleError);
     };

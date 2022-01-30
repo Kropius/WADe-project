@@ -7,11 +7,10 @@ import Input from "@awsui/components-react/input";
 import Button from "@awsui/components-react/button";
 import Dictaphone from "./Dictatophone";
 import {FormField, Spinner} from "@awsui/components-react";
+import isEmpty from "lodash/isEmpty";
 
-
-const InputComponent = ({setNewRequest, isLoading}) => {
+const InputComponent = ({setNewRequest, isLoading, selectedApi}) => {
     const [value, setValue] = React.useState("");
-
 
     return (
         <Box>
@@ -23,7 +22,8 @@ const InputComponent = ({setNewRequest, isLoading}) => {
                     />
                     <FormField>
                         <SpaceBetween size="m" direction="horizontal">
-                            <Button variant="primary" onClick={() => setNewRequest({message: value, isRequest: true})}>
+                            <Button variant="primary" onClick={() => setNewRequest({message: value, isRequest: true})}
+                                    disabled={isEmpty(selectedApi?.label)}>
                                 <SpaceBetween size={"m"} direction={"horizontal"}>
                                     <div>
                                         Get

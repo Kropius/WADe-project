@@ -1,6 +1,6 @@
 const AppContextInitData = {
     selectedSpecification:{
-        id: null
+        label: null
     },
     specifications: [],
     receivedNLPResults:[]

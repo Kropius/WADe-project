@@ -9,7 +9,9 @@ const SpecificationApi = () =>{
     };
     const submitNewSpecification = async (resource) =>{
         return CallableApi().post(ENDPOINTS.PATHS.BASE_PATH + ENDPOINTS.PATHS.SPECIFICATIONS.SUBMIT_NEW_SPEC,
-            resource, {key: ENDPOINTS.API_KEY});
+            null,
+
+            resource);
 
     };
     return {

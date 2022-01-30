@@ -5,7 +5,6 @@ import RequestMessage from "../message-component/RequestMessage";
 import ResponseMessage from "../message-component/ResponseMessage";
 import {useAppContext} from "../../../context/AppContext";
 import NLPApi from "../../../api/NLPApi";
-// import PubSub from "pubsub-js";
 
 // eslint-disable-next-line react/display-name
 const ResultsArea = forwardRef((props, ref) => {

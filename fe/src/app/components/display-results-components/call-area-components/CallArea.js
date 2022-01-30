@@ -1,30 +1,28 @@
 import React, {useEffect, useState} from "react";
 import {Button} from "@awsui/components-react";
+import CallAreaConfigurations from "./CallAreaConfigurations";
 
 
 const CallArea = ({selectedApi, path, queryParams, requestBody, verb}) =>{
     // const [isValid, setIsValid] = useState(true);
     const [selecteedApi, setSelecteedApi] = useState(null);
-
     useEffect(()=>{
         setSelecteedApi(selectedApi);
     },[]);
 
-    useEffect(()=>{
-        performRequest();
-    });
-
-
     function performRequest(){
-        const fullPath = selecteedApi?.link + [path,queryParams].filter((pathItem)=> pathItem!=="N/A").join("");
-        console.log(fullPath, requestBody, verb);
+        const fullPath = selecteedApi?.url + [path,queryParams].filter((pathItem)=> pathItem!=="N/A").join("");
+        if(verb)CallAreaConfigurations.performCall(verb,fullPath, null,  requestBody);
     }
 
     return(
         <div>
 
         <Button variant="primary" iconAlign="right"
-                iconName="external">Call with the above parameters to {selecteedApi?.label}</Button>
+                iconName="external"
+        onClick={performRequest}>
+            Call with the above parameters to {selecteedApi?.label}
+         </Button>
         </div>
     );
 };

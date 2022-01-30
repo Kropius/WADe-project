@@ -118,8 +118,8 @@
           "required": true
         },
         "responses": {
-          "204": {
-            "description": "A successful response",
+          "200": {
+            "description": "Ok",
             "content": {
               "application/json": {
                 "schema": {
@@ -186,8 +186,8 @@
           "required": true
         },
         "responses": {
-          "204": {
-            "description": "A successful response",
+          "200": {
+            "description": "Ok",
             "content": {
               "application/json": {
                 "schema": {
@@ -286,8 +286,8 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "A successful response",
+          "200": {
+            "description": "Ok",
             "content": {
               "application/json": {
                 "schema": {
@@ -519,8 +519,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Ok",
+          "201": {
+            "description": "Created",
             "content": {
               "application/json": {
                 "schema": {
@@ -576,8 +576,8 @@
           "required": true
         },
         "responses": {
-          "204": {
-            "description": "A successful response",
+          "200": {
+            "description": "Ok",
             "content": {
               "application/json": {
                 "schema": {

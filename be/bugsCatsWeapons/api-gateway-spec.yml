@@ -65,6 +65,7 @@ paths:
         - api_key: []
       x-google-backend:
         address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+        path_translation: APPEND_PATH_TO_ADDRESS
     put:
       tags:
         - cats
@@ -77,8 +78,8 @@ paths:
           schema:
             $ref: '#/definitions/FelineRequestBody'
       responses:
-        '204':
-          description: A successful response
+        '200':
+          description: Ok
           schema:
             $ref: '#/definitions/GenericResponse'
         '401':
@@ -97,6 +98,7 @@ paths:
         - api_key: []
       x-google-backend:
         address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+        path_translation: APPEND_PATH_TO_ADDRESS
       x-codegen-request-body-name: body
     patch:
       tags:
@@ -110,8 +112,8 @@ paths:
           schema:
             $ref: '#/definitions/FelineRequestBody'
       responses:
-        '204':
-          description: A successful response
+        '200':
+          description: Ok
           schema:
             $ref: '#/definitions/GenericResponse'
         '401':
@@ -130,6 +132,7 @@ paths:
         - api_key: []
       x-google-backend:
         address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+        path_translation: APPEND_PATH_TO_ADDRESS
       x-codegen-request-body-name: body
     delete:
       tags:
@@ -163,8 +166,8 @@ paths:
           description: The number of legs that the feline has
           type: string
       responses:
-        '204':
-          description: A successful response
+        '200':
+          description: Ok
           schema:
             $ref: '#/definitions/GenericResponse'
         '401':
@@ -183,6 +186,7 @@ paths:
         - api_key: []
       x-google-backend:
         address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+        path_translation: APPEND_PATH_TO_ADDRESS
       x-codegen-request-body-name: body
     options:
       tags:
@@ -203,6 +207,7 @@ paths:
         - api_key: []
       x-google-backend:
         address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+        path_translation: APPEND_PATH_TO_ADDRESS
   /bug:
     delete:
       tags:
@@ -247,6 +252,7 @@ paths:
         - api_key: []
       x-google-backend:
         address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+        path_translation: APPEND_PATH_TO_ADDRESS
     options:
       tags:
         - bugs
@@ -266,6 +272,7 @@ paths:
         - api_key: []
       x-google-backend:
         address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+        path_translation: APPEND_PATH_TO_ADDRESS
   /weapon:
     post:
       tags:
@@ -279,8 +286,8 @@ paths:
           schema:
             $ref: '#/definitions/WeaponRequestBody'
       responses:
-        '200':
-          description: Ok
+        '201':
+          description: Created
           schema:
             $ref: '#/definitions/GenericResponse'
         '401':
@@ -295,6 +302,7 @@ paths:
         - api_key: []
       x-google-backend:
         address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+        path_translation: APPEND_PATH_TO_ADDRESS
     put:
       tags:
         - weapons
@@ -307,8 +315,8 @@ paths:
           schema:
             $ref: '#/definitions/WeaponRequestBody'
       responses:
-        '204':
-          description: A successful response
+        '200':
+          description: Ok
           schema:
             $ref: '#/definitions/GenericResponse'
         '401':
@@ -327,6 +335,7 @@ paths:
         - api_key: []
       x-google-backend:
         address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+        path_translation: APPEND_PATH_TO_ADDRESS
       x-codegen-request-body-name: body
     options:
       tags:
@@ -347,6 +356,7 @@ paths:
         - api_key: []
       x-google-backend:
         address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+        path_translation: APPEND_PATH_TO_ADDRESS
 definitions:
     FelineRequestBody:
       type: object

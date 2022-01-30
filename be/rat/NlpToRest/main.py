@@ -166,7 +166,7 @@ def find_attribute_names(nlp_response, valid_attributes, entity_index):
         if token.dependency_edge.head_token_index == entity_index and token.part_of_speech.tag.name == 'ADJ':
             values_list.append((index, token.text.content))
 
-    sentence_attributes = values_list + recursive_find_noun_attributes(nlp_response, entity_index)
+    sentence_attributes = recursive_find_noun_attributes(nlp_response, entity_index) + values_list
 
     for attribute in sentence_attributes:
         attribute_synsets = wordnet.synsets(attribute[1])
@@ -181,18 +181,20 @@ def find_attribute_names(nlp_response, valid_attributes, entity_index):
                         max_similarity = current_similarity
                         real_attribute_name = valid_attribute
         real_attribute_list.append(real_attribute_name)
+        valid_attributes.remove(real_attribute_name)
 
     return sentence_attributes, real_attribute_list, values_list
 
 
 def find_rest_of_attribute_values(nlp_response, sentence_attributes, found_values):
-    unmapped_attributes = sentence_attributes[len(found_values):]
-    all_values = found_values
+    unmapped_attributes = sentence_attributes[:len(sentence_attributes) - len(found_values)]
+    all_values = []
     for attribute in unmapped_attributes:
         for index, token in enumerate(nlp_response.tokens):
             if token.dependency_edge.head_token_index == attribute[0] and \
                     (token.part_of_speech.tag.name == 'ADJ' or token.part_of_speech.tag.name == 'NUM'):
                 all_values.append((index, token.text.content))
+    all_values += found_values
     return all_values
 
 

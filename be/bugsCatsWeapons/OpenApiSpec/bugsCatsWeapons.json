@@ -368,11 +368,6 @@
             }
           }
         },
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
         "x-google-backend": {
           "address": "https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons"
         }
@@ -491,11 +486,6 @@
             }
           }
         },
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
         "x-google-backend": {
           "address": "https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons"
         }
@@ -658,11 +648,6 @@
             }
           }
         },
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
         "x-google-backend": {
           "address": "https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons"
         }

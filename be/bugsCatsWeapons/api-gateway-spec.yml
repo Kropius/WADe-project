@@ -203,8 +203,6 @@ paths:
           description: Something went wrong
           schema:
             $ref: '#/definitions/Error'
-      security:
-        - api_key: []
       x-google-backend:
         address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
         path_translation: APPEND_PATH_TO_ADDRESS
@@ -268,8 +266,6 @@ paths:
           description: Something went wrong
           schema:
             $ref: '#/definitions/Error'
-      security:
-        - api_key: []
       x-google-backend:
         address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
         path_translation: APPEND_PATH_TO_ADDRESS
@@ -352,8 +348,6 @@ paths:
           description: Something went wrong
           schema:
             $ref: '#/definitions/Error'
-      security:
-        - api_key: []
       x-google-backend:
         address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
         path_translation: APPEND_PATH_TO_ADDRESS

@@ -1,12 +1,10 @@
 swagger: '2.0'
 info:
-  title: wade-rat-mihtei-rezciopan WADE-RAT|Mihtei-Rezciopan
-  description: |+
-    ### Tell REST what to do and take a rest
+  title: wade-rat-mihtei-rezciopan WADE-RAT|Mihtei-Rezciopan - Test API
+  description: |-
+    ### Simple test API for the RAT project
 
-    This file represents the OpenAPI 3.0 specification of the [RAT WADe Project](https://profs.info.uaic.ro/~busaco/teach/courses/wade/projects/index.html) of Fall 2021 made by Cioata Matei-Alexandru, Lipan Radu-Matei, Rezmerita Mihnea-Ioan. More information on what this api helps to achive can be found in the link attached.
-
-    The list below represents a necessary but not sufficient list of REST routes neccesar to create a tool which allows interacting with a REST API using natural language. The list will be updated as the project evolves.
+    This file represents the OpenAPI 2.0 specification of the [RAT WADe Project Test API](https://profs.info.uaic.ro/~busaco/teach/courses/wade/projects/index.html) of Fall 2021 made by Cioata Matei-Alexandru, Lipan Radu-Matei, Rezmerita Mihnea-Ioan. The API described below serves for testing purposes and helps creating a proof of concept for the RAT project.
   version: 1.0.0
 securityDefinitions:
   api_key:
@@ -18,257 +16,387 @@ schemes:
 produces:
   - application/json
 paths:
-  /apis:
-    options:
-      operationId: apisOptions
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      x-google-backend:
-        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/postApi
+  /feline:
+    get:
+      tags:
+        - cats
+      summary: Lists all felines with specified filters
+      operationId: felinesQuery
+      parameters:
+        - name: id
+          in: query
+          required: false
+          description: The ID of the feline
+          type: string
+        - name: feeling
+          in: query
+          required: false
+          description: The emotional state of the feline
+          type: string
+        - name: color
+          in: query
+          required: false
+          description: The color of the feline's fur
+          type: string
+        - name: muscle
+          in: query
+          required: false
+          description: The feline's physical state
+          type: string
+        - name: members
+          in: query
+          required: false
+          description: The number of legs that the feline has
+          type: string
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Something went wrong
+          schema:
+            $ref: '#/definitions/Error'
       security:
-      - api_key: []
+        - api_key: []
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+    put:
+      tags:
+        - cats
+      summary: Replaces and existing feline with another one.
+      operationId: felinesPut
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/definitions/FelineRequestBody'
       responses:
         '204':
           description: A successful response
-    post:
-      tags:
-      - Apis
-      summary: Creates a new Api entry in our database
-      operationId: postApi
-      x-google-backend:
-        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/postApi
-      security:
-      - api_key: []
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: true
-        schema:
-          $ref: "#/definitions/ApiSpecification"
-      responses:
-        201:
-          description: Created
-          schema: {}
-        409:
-          description: Conflict
-          schema: 
-            $ref: "#/definitions/Error"
-        412:
-          description: Precondition Failed
-          schema: 
-            $ref: "#/definitions/Error"
-    get:
-      tags:
-        - Apis
-      summary: Lists all stored api specifications
-      operationId: listApis
-      x-google-backend:
-        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/listApis
-      security:
-        - api_key: [ ]
-      consumes:
-        - "application/json"
-      produces:
-        - "application/json"
-      responses:
-        200:
-          description: Ok
           schema:
-            type: array
-            items:
-              $ref: "#/definitions/ApiSpecification"
-  /apis/{id}:
-    options:
-      operationId: apisIdOptions
-      parameters:
-      - name: id
-        in: path
-        required: true
-        type: string
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      x-google-backend:
-        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/getApi
+            $ref: '#/definitions/GenericResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: Precondition Failed
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Something went wrong
+          schema:
+            $ref: '#/definitions/Error'
       security:
-      - api_key: []
+        - api_key: []
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+      x-codegen-request-body-name: body
+    patch:
+      tags:
+        - cats
+      summary: Update an existing feline's attributes.
+      operationId: felinesPatch
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/definitions/FelineRequestBody'
+      responses:
+        '204':
+          description: A successful response
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: Precondition Failed
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Something went wrong
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+        - api_key: []
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+      x-codegen-request-body-name: body
+    delete:
+      tags:
+        - cats
+      summary: Delete all felines with given attributes.
+      operationId: felinesDelete
+      parameters:
+        - name: id
+          in: query
+          required: false
+          description: The ID of the feline
+          type: string
+        - name: feeling
+          in: query
+          required: false
+          description: The emotional state of the feline
+          type: string
+        - name: color
+          in: query
+          required: false
+          description: The color of the feline's fur
+          type: string
+        - name: muscle
+          in: query
+          required: false
+          description: The feline's physical state
+          type: string
+        - name: members
+          in: query
+          required: false
+          description: The number of legs that the feline has
+          type: string
+      responses:
+        '204':
+          description: A successful response
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: Precondition Failed
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Something went wrong
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+        - api_key: []
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+      x-codegen-request-body-name: body
+    options:
+      tags:
+        - cats
+      operationId: catsOptions
+      responses:
+        '204':
+          description: A successful response
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Something went wrong
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+        - api_key: []
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+  /bug:
+    delete:
+      tags:
+        - bugs
+      summary: Deletes all bugs with specified filters
+      operationId: bugsDelete
+      parameters:
+        - name: id
+          in: query
+          required: false
+          description: The ID of the bug
+          type: string
+        - name: feeling
+          in: query
+          required: false
+          description: The emotional state that the bug causes
+          type: string
+        - name: color
+          in: query
+          required: false
+          description: The color of the bug
+          type: string
+        - name: members
+          in: query
+          required: false
+          description: The number of legs that the bug has
+          type: string
       responses:
         '200':
-          description: A successful response
-    get:
-      tags:
-      - Apis
-      summary: Get all data about a stored Api
-      operationId: getApi
-      x-google-backend:
-        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/getApi
-      security:
-      - api_key: []
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: id
-        in: path
-        required: true
-        type: string
-      responses:
-        200:
           description: Ok
           schema:
-            type: array
-            items:
-              $ref: "#/definitions/Api"
-        404:
-          description: Not Found
-          schema: 
-            $ref: "#/definitions/Error"
-  /apis/{id}/nlp-to-rest:
-    options:
-      operationId: apisIdNlpToRestOptions
-      parameters:
-      - name: id
-        in: path
-        required: true
-        type: string
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      x-google-backend:
-        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/nlpToRest
+            $ref: '#/definitions/GenericResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Something went wrong
+          schema:
+            $ref: '#/definitions/Error'
       security:
-      - api_key: []
+        - api_key: []
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+    options:
+      tags:
+        - bugs
+      operationId: bugsOptions
       responses:
-        '200':
+        '204':
           description: A successful response
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Something went wrong
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+        - api_key: []
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+  /weapon:
     post:
       tags:
-      - Apis
-      summary: Translate a command given in natural language into a valid REST request
-      operationId: nlpToRest
-      x-google-backend:
-        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/nlpToRest
-      security:
-      - api_key: []
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+        - weapons
+      summary: Creates a new weapon with specified attributes.
+      operationId: weaponsCreation
       parameters:
-      - name: "id"
-        in: "path"
-        description: "Id of specification used while translating"
-        required: true
-        type: "string"
-      - in: "body"
-        name: "text_content"
-        required: true
-        description: Natural language text to be transformed into a valid REST request for the API specified
-        schema:
-          type: object
-          properties:
-            text:
-              type: string
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/definitions/WeaponRequestBody'
       responses:
-        200:
+        '200':
           description: Ok
-          schema: 
-            $ref: "#/definitions/RestRequest"
-        412:
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Something went wrong
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+        - api_key: []
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+    put:
+      tags:
+        - weapons
+      summary: Replaces and existing weapon with another one.
+      operationId: weaponsPut
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/definitions/WeaponRequestBody'
+      responses:
+        '204':
+          description: A successful response
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
           description: Precondition Failed
-          schema: 
-            $ref: "#/definitions/Error"
-        404:
-          description: Not Found
-          schema: 
-            $ref: "#/definitions/Error"
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Something went wrong
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+        - api_key: []
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
+      x-codegen-request-body-name: body
+    options:
+      tags:
+        - weapons
+      operationId: weaponsOptions
+      responses:
+        '204':
+          description: A successful response
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Something went wrong
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+        - api_key: []
+      x-google-backend:
+        address: https://europe-west1-avid-airway-337117.cloudfunctions.net/bugsCatsWeapons
 definitions:
-  Api:
-    type: object
-    properties:
-      id:
-        type: string
-      url:
-        type: string
-      openApiSpecificationUrl:
-        type: string
-      authenticationType:
-        type: string
-        enum: [None, ApiKey, OAuth]
-      credentials:
-        type: array
-        items:
-          $ref: "#/definitions/Dictionary"
-      endpoints:
-        type: array
-        items:
-          type: object
-          properties:
-            verb:
-              type: string
-              enum: [GET, POST, PUT, PATCH, DELETE]
-            path:
-              type: string
-            body:
-              type: object
-            entity:
-              type: string
-            attributes:
-              type: array
-              items:
-                type: object
-                properties:
-                  name:
-                    type: string
-                  paramName:
-                    type: string
-                  paramType:
-                    type: string
-                    enum: [Query, Body, Path]
-  Dictionary:
-    type: object
-    properties:
-      key:
-        type: "string"
-      value:
-        type: "string"
-  RestRequest:
-    type: object
-    properties:
-      verb:
-        type: string
-      url:
-        type: string
-      headers:
-        type: array
-        items:
-          $ref: "#/definitions/Dictionary"
-      body:
-        type: string
-  Error:
-    type: object
-    properties:
-      status:
-        type: "string"
-      type:
-        type: "string"
-      message:
-        type: "string"
-  ApiSpecification:
-    type: object
-    properties:
-      id:
-        type: string
-      url:
-        type: string
-      openApiSpecification:
-        type: string
+    FelineRequestBody:
+      type: object
+      properties:
+        id:
+          type: string
+        feeling:
+          type: string
+        color:
+          type: string
+        muscle:
+          type: string
+        members:
+          type: string
+    BugRequestBody:
+      type: object
+      properties:
+        id:
+          type: string
+        feeling:
+          type: string
+        color:
+          type: string
+        members:
+          type: string
+    WeaponRequestBody:
+      type: object
+      properties:
+        id:
+          type: string
+        force:
+          type: string
+        color:
+          type: string
+    GenericResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    Dictionary:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string

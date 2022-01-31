@@ -152,10 +152,10 @@
 				</li>
                 <li>
 					<em>Identifying the attribute values: </em>  Natural Language API provides a direct dependency between nouns and 
-					corresponding adjectives, numerals and determiners;
+					corresponding adjectives and numerals;
 				</li>
 				<li>
-					Parts of speech other than nouns, adjectives, numerals, verbs and determiners will be ignored in the tree building process.
+					Parts of speech other than nouns, adjectives, numerals and verbs will be ignored in the tree building process.
 				</li>
             </ul>
 			<p>
@@ -171,22 +171,17 @@
 			<p>
 				&emsp; &emsp;
 				The match for the above request would be GET on path /cats?color=blue. Even though “colouring” resembles “color”, we need a
-				way to match these words. A very good candidate for this would be Word2Vec or any similar tool.
+				way to match these words. A very good candidate for this is WordNet.
 			</p>
 			<p>
 				&emsp; &emsp;
-				“Word2vec is a technique for natural language processing published in 2013. The word2vec algorithm uses a neural network 
-				model to learn word associations from a large corpus of text.” (2) This tool offers the possibility to easily detect 
+				“WordNet is a large lexical database of English. Nouns, verbs, adjectives and adverbs are grouped into sets of cognitive synonyms (synsets), each expressing a distinct concept. 
+				Synsets are interlinked by means of conceptual-semantic and lexical relations. WordNet is also freely and publicly available for download. 
+				WordNet's structure makes it a useful tool for computational linguistics and natural language processing.” (2) This tool offers the possibility to easily detect 
 				synonyms or related words, based on a score. The root verb will always be detected this way. In the beginning of the 
-				algorithm, we can set a default pair for each HTTP verb (for example: GET - “Provide”, POST - “Create”, PUT - “Replace”, 
-				DELETE - “Delete”, PATCH - “Update”). Using Word2Vec, “Show” will be matched with “Provide” with a high score, therefore 
-				matching with GET.
-			</p>
-			<p>
-				&emsp; &emsp;
-				As an observation from the above example, “all” has been kept in the syntactic tree. It is a determiner and it communicates 
-				that all cats should be retrieved. Another valid determiner would be “a” in which case a single cat should be retrieved 
-				(the first one or a random one). There are also examples that should be ignored: “the”, “this”, “few” etc..
+				algorithm, we can set one or multiple default pairs for each HTTP verb (for example: GET - “Retrieve”, POST - [“Create”, "Add"], 
+				PUT - “Replace”, DELETE - [“Delete”, "Exterminate", "Remove], PATCH - “Update”). Using WordNet, “Show” will be matched with “Retrieve” with a 
+				high score, therefore matching with GET.
 			</p>
 			<p>
 				&emsp; &emsp;
@@ -215,9 +210,58 @@
                      Use the text returned as the text <em>typed</em> by our user in incoming steps;
                  </li>
             </ol>
+			<h3 id="nlpImplementation">4.2 NLP Implementation </h3>
+            <p>&emsp; &emsp;
+                As mentioned in Chapter 3, our NLP functionality is deployed in a Google Cloud Function. The algorithm executes the following steps:
+            </p>
+            <ol>
+                <li>
+                   The input is represented by two components: the <em>text_content</em> representing the user's sentence and the 
+				   <em>api_spec_id</em> which is the ID of the API specification to use in the analysis;
+                </li>
+                <li>
+                    Make a call to <a href="https://cloud.google.com/natural-language">Google Cloud Natural Language Processing API</a> using
+					the <em>text_content</em> sentence as input to get the necessary NLP information;
+                 </li>
+                 <li>
+                    Make a call to our own API (GET /apis/{id}, where {id} is the received <em>api_spec_id</em> - <a href="#restApi">see Chapter 5 - Rest API</a>)
+					to get the parsed OpenAPI specification. This will provide a dictionary with two important keys: <em>allowed_operations</em> 
+					(mappings between HTTP verbs and entities) and <em>allowed_attributes</em> (valid attributes for each entity);
+                 </li>
+				 <li>
+					Use the data from steps 2 and 3 to compute the exact steps described in <a href="#NLP"> the beginning of Chapter 4</a>.
+				 </li>
+				 <li>
+					Throw errors in situations like: the matched pair of HTTP verb and entity is not found in the <em>allowed_operations</em>
+					list, there was no entity found with high-enough similarity (minimum 60%), the input provided is in the wrong format etc..
+				 </li>
+				 <li>
+					After every step executed successfully, respond with: matched HTTP verb, matched path, query parameter string for GET and 
+					DELETE verbs OR request body for POST, PUT and PATCH.
+				 </li>
+            </ol>
+			<h3 id="nlpLimitations">4.3 NLP Algorithm limitations </h3>
+			<p>&emsp; &emsp;
+                The algorithm used for the RAT project, even though it can parse sentences and match words by their similarity, it also has some limitations:
+			</p>
+			<ul>
+				<li>
+					Although <a href="https://cloud.google.com/natural-language">Google Cloud Natural Language Processing API</a> offers multilingual support,
+					WordNet is unfortunately limited to the English vocabulary, as stated in <a href="#bibliography"> bibliography, (2)</a>. Therefore, 
+					only english sentences can be handled in our project;
+				</li>
+				<li>
+					The entity names and attributes from the API specifications cannot contain symbols like '-', '_' etc.. If they do, WordNet cannot recognize
+					them as English words;
+				</li>
+				<li>
+					The algorithm does not support paths having depth > 1 (for example, /felines/{id}/owners). It is limited to only finding
+					a main entity and taking it as the path.
+				</li>
+			</ul>
         </section>
         <section>
-            <h2>5. Rest API</h2>
+            <h2 id="restApi">5. Rest API</h2>
             <p> &emsp; &emsp;
                 The following routes will be <em>necessary but not sufficient</em> for our project:
             </p>
@@ -258,11 +302,66 @@
             </p>
 
         </section>
+		<section>
+			<h2>7. Test API</h2>
+			<p> 
+				&emsp; &emsp; 
+				In order to easily test and demo our project, we decided to create a simple API that proves the concept of RAT: Bugs, Cats & Weapons API!
+				It consists of three main entities: felines, bugs and weapons and each of them are compatible with different combinations of HTTP verbs
+				to demonstrate the error handling mechanism from the NLP algorithm:
+			</p>
+				<ul>
+					<li>
+						/feline - GET, PUT, PATCH, DELETE
+					</li>
+					<li>
+						/bug - DELETE
+					</li>
+					<li>
+						/weapon - POST, PUT
+					</li>
+				</ul>
+			<p>
+				For example, the sentence "Create a cockroach with brown color and six legs.", matching POST on path /bug, will throw an error at the
+				NLP function level because the operation is not supported. 
+			</p>
+			<p>
+				The simplicity of this API is brought by the fact that all routes will return a <em>Generic Response</em>, meaning a simple message
+				containing important request data: verb, path and parameters.
+				Bugs, Cats & Weapons API is sufficient for the scope of this project since it respects the created OPEN API specification. The only missing concept is
+				data persistence.
+			</p>
+			<p>
+				For the test API, we used a separate <a href="https://cloud.google.com/api-gateway">Google Cloud API Gateway </a> to ensure 
+				authentication and Open API specification compliance, respectively <a href="https://cloud.google.com/functions">Google Cloud Functions</a>
+				as computation provider. We can also observe logs to check that the API is indeed being called. 
+			</p>
+		</section>
+		<section>
+			<h2> 8. Future plans </h2>
+			<p>
+				&emsp; &emsp;
+				This implementation for the RAT project, even though it satisfies the majority of the specifications, it still needs work on certain areas
+				for improvement:
+			</p>
+			<ul>
+				<li>
+					Address the NLP limitations mentioned in <a href = "#nlpLimitations">section 4.3</a>;
+				</li>
+				<li>
+					Implement a way to determine API credentials dynamically. As this information is not stored in the API specification, another way must be
+					found to keep this. At the same time, multiple types of auth have to be treated;
+				</li>
+				<li>
+					Auth mechanism for our own APIs, such that not everyone can add new specifications etc..
+				</li>
+			</ul>
+		</section>
         <section>
-            <h2>7. Bibliography</h2>
+            <h2 id="bibliography">9. Bibliography</h2>
             <ol>
 				<li> <a href="https://cloud.google.com/natural-language/docs/basics">Google Cloud - Natural Language API</a> </li>
-				<li> <a href="https://en.wikipedia.org/wiki/Word2vec">Word2Vec - Word Association tool</a> </li>
+				<li> <a href="https://wordnet.princeton.edu/">WordNet - Word Association tool</a> </li>
 				<li> <a href="https://arxiv.org/pdf/2007.15280.pdf">PHOTON: A Robust Cross-Domain Text-to-SQL System - Jichuan Zeng, Xi Victoria Lin,
 				Caiming Xiong, Richard Socher, Michael R. Lyu, Irwin King, Steven C.H. Hoi</a> </li>
 				<li> <a href="https://cloud.google.com/api-gateway/docs">Google Cloud - API Gateway </a> </li>

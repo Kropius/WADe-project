@@ -15,7 +15,7 @@ Show me all panthers with black color, 4 legs and happy feeling. - GET
 
 PetStore:
 
-create a pet with name Happy and status hungry. - POST
+create a pet with name happy and status hungry. - POST
 
 
 Youtube:

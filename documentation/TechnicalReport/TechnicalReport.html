@@ -103,7 +103,7 @@
             </p>
             <p> &emsp; &emsp;
                 We will also be using <a href="https://cloud.google.com/natural-language">Google Cloud Natural Language Processing API</a> and 
-            <a href="">|What Mihnea used for Speech Recognition|</a> as described in <em><a href="#NLP">4. Natural Language Processing</a></em>
+            <a href="https://www.npmjs.com/package/react-speech-recognition">React speech recognition</a> as described in <em><a href="#NLP">4. Natural Language Processing</a></em>
             and <em><a href="#speechRecognition">4.1 Optional Preprocessing: Speech recognition</a></em> respectively.
             </p>
             <p> &emsp; &emsp;
@@ -197,22 +197,15 @@
 
             <h3 id="speechRecognition">4.1 Optional Preprocessing: <em>Speech recognition</em> </h3>
             <p>&emsp; &emsp;
-                A nice bonus would be to have speech recognition capabilities, meaning that the user will be able
-                to use his voice in order to <em>type</em> his request.
-
-                In order to do this, we will have to:
+                <p> &emsp; &emsp;
+                It is worth mentioning and discussing the speech to text capabilities of our application. The application can take as input, using the user's microphone, some audio recordings and will
+                try to translate them into text. We are using <a href="https://www.npmjs.com/package/react-speech-recognition">React speech recognition</a>. As mentioned in the documentation, under the hood, 
+                it uses <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API">Web Speech API </a>.
             </p>
-            <ol>
-                <li>
-                   Let the user record his voice and save it in cookies or browser storage;
-                </li>
-                <li>
-                    Send the recording to <a href="https://cloud.google.com/speech-to-text">Google Cloud Speech-To-Text</a> service;
-                 </li>
-                 <li>
-                     Use the text returned as the text <em>typed</em> by our user in incoming steps;
-                 </li>
-            </ol>
+            <p> &emsp; &emsp;
+                As the documentation says, this library works perfect with Google Chrome. We experimented a bit with Mozilla, but there was no success using it. The <a href= "https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition">Speech Recognition documentation</a> states that browsers like Google Chrome, might use some server-based recognition engine, meaning that the speech recognition functionality will not work offline. This is true.
+            </p>
+
 			<h3 id="nlpImplementation">4.2 NLP Implementation </h3>
             <p>&emsp; &emsp;
                 As mentioned in Chapter 3, our NLP functionality is deployed in a Google Cloud Function. The algorithm executes the following steps:
@@ -301,16 +294,19 @@
         </section>
         <section>
             <h2>6. Front-end</h2>
-            <p> &emsp; &emsp; The user will interact with a single-page application(SPA), built with React or Angular. </p>
+            <p> &emsp; &emsp; The user will interact with a single-page application(SPA), built with React. </p>
             <figure typeOf="sa:image" class="ignore-margins">
-                <img src="../ArchitectureAndDesign/rat-frontend-highlighted.png" alt="Frontend Design">
+                <img src="../ArchitectureAndDesign/rat-front-end.png" alt="Frontend Design">
                 <figcaption style="text-align: center;">Fig. 5: Front-end concept</figcaption>
             </figure>
             <p>&emsp; &emsp;
-                The design above is more of a guideline and might not be replicated perfectly. Highlited we have short explanations for each ui element
-            and how it is going to interact with our API. The SwaggerUI component will be created by using <a href="https://www.npmjs.com/package/angular-swagger-ui">angular-swagger-ui</a>.
+                The photo above represents the final version of the UI interface. Each component has a very well defined purpose. The SwaggerUI component was created using 
+                <a href="https://www.npmjs.com/package/swagger-ui-react">react-swagger-ui</a>.
             </p>
-
+            <p> &emsp; &emsp;
+                The components used are part of <a href="https://www.npmjs.com/package/@awsui/components-react">AWS-UI</a> library.
+            </p>
+            
         </section>
 		<section>
 			<h2>7. Test API</h2>
@@ -384,6 +380,7 @@
 				<li> <a href="https://cloud.google.com/storage#section-4">Google Cloud Storage</a> </li>
 				<li> <a href="https://firebase.google.com/products/firestore">Cloud Firestore</a> </li>
 				<li> <a href="https://cloud.google.com/speech-to-text#section-6">Google Cloud - Speech to Text</a> </li>
+                <li> <a href="https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition">Speech Recognition </a> </li>
 			</ol>
         </section>
 

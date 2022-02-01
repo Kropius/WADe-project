@@ -87,20 +87,23 @@
             help us better decouple the logic between our endpoints while keeping costs at a minimum with the "pay as you go" approach of such services.
             We will be able to choose our programming language based on what that function needs to do (in example, python for NLP, NodeJs for CRUD operations
             on our noSql Database) without needing to setup a separate server for that language as well. One main drawback of this approach would be the 
-            "cold starts" that appear on log traffic but there are workarounds for that: some light weight languages and frameworks like NodeJs have way smaller
-            cold starts than others like Java and if that's not enough we can always put in place a warmup system. In order to provide a common interface and url
-            for all our functions, we will be using <a href="https://cloud.google.com/api-gateway">Google Cloud API Gateway</a>. This way we have a single point where
-            we need to setup the authentication for our api and where we can check that everything specified in <a href="../OpenApi/openapi.yaml">our OpenAPI specification</a>
-            is indeed followed accordingly.
+            "cold starts" that appear on log traffic but there are workarounds for that: some light weight languages and frameworks like NodeJs or Python have way smaller
+            cold starts than others like Java and if that's not enough we can always put in place a warmup system. We ended up using python because we have to work with 
+            both Json specification, using a Nlp model and parsing large dictionaries all 3 being jobs for each python3 is very  powerful.
             </p>
             <p> &emsp; &emsp;
-                For storage we will be using <a href="https://cloud.google.com/firestore">Firestore</a>, Google Cloud's main NoSQL solution. We'll be going with noSql
+            In order to provide a common interface and url for all our functions, we will be using <a href="https://cloud.google.com/api-gateway">Google Cloud API Gateway</a>. This way we have a single point where
+            we need to setup the authentication for our api and where we can check that everything specified in <a href="../OpenApi/openapi.yaml">our OpenAPI specification</a>
+            is indeed followed accordingly, especially because the API Gateway specification for Google Cloud is also a <a href="https://cloud.google.com/api-gateway/docs/creating-api-config">V2 OpenApi specification</a>.
+            </p>
+            <p> &emsp; &emsp;
+                For storage we will be using <a href="https://cloud.google.com/firestore">Firestore</a>, Google Cloud's main NoSQL solution: Datastore. We'll be going with noSql
             because we have only one type of entities: apis; we don't have any complex relationships between entities besides some child-parent relationships
             (api-endpoints-attributes). Also, the change of one child doesn't need to be reflected in all of its other appearences so we don't have a need for normalisation.
             </p>
             <p> &emsp; &emsp;
                 We will also be using <a href="https://cloud.google.com/natural-language">Google Cloud Natural Language Processing API</a> and 
-            <a href="https://cloud.google.com/speech-to-text">Google Cloud Speech-To-Text API</a> as described in <em><a href="#NLP">4. Natural Language Processing</a></em>
+            <a href="">|What Mihnea used for Speech Recognition|</a> as described in <em><a href="#NLP">4. Natural Language Processing</a></em>
             and <em><a href="#speechRecognition">4.1 Optional Preprocessing: Speech recognition</a></em> respectively.
             </p>
             <p> &emsp; &emsp;
@@ -258,24 +261,31 @@
 					The algorithm does not support paths having depth > 1 (for example, /felines/{id}/owners). It is limited to only finding
 					a main entity and taking it as the path.
 				</li>
+                <li>
+                    The algorithm does not learn from past queries on the same api specification. this is a drawback of using a general use, already trained model like <a href="https://cloud.google.com/natural-language">Google Cloud Natural Language Processing API</a>.
+                    Using Google Cloud Natural Language Processing API comes with the advantage that we are getting one of the most powerful and complete Nlp models and that it works without the need for us to retrain it for each new API specification added,
+                    but this advantage is also a drawback as we don't have the ability to improve the model for our very specific usecase on subsequent requests. If we find this as a feature in the future we could either try to make our fork of Google's Nlp 
+                    model or try to create a new custom model from the ground up, but this would require training for each new Api specification added which could be an unpleasent experience for the end user.
+                </li>
 			</ul>
         </section>
         <section>
             <h2 id="restApi">5. Rest API</h2>
             <p> &emsp; &emsp;
-                The following routes will be <em>necessary but not sufficient</em> for our project:
+                The following routes are the ones currently used by for our project:
             </p>
             <ul>
                 <li>
-                    <b>POST /apis</b> - creates a new Api entry in the database.
+                    <b>POST /apis</b> - creates a new Api entry in the database. In this call, the OpenApi specification is parsed and relevant information is saved in Datastore
+                    where it will be extracted by the Nlp function and frontend through GET and LIST endpoints;
                 </li>
                 <li>
-                    <b>GET /apis/{id}</b> - returns all data about the api with the given <em>id</em>. This endpoint cannot be used directly by users.
+                    <b>GET /apis</b> - lists all stored api specifications. By specification, we mean all the data necessary to display
+                    the api in our frontend app: api's internal id, api's public url, api's OpenApi specification url. In the future, this should also include
+                    and information about how we should authenticate to the respective api (see <a href="#futurePlans">Future Plans</a>);
                 </li>
                 <li>
-                    <b>GET /apis/specifications</b> - lists all stored api specifications. By specification, we mean all the data necessary to display
-                    the api in our frontend app: api's internal id, api's public url, api's OpenApi specification url and information about how we should
-                    authenticate to the respective api (ApiKey, Oauth2 or no authentication needed)
+                    <b>GET /apis/{id}</b> - returns all data about the api with the given <em>id</em>. This endpoint cannot be used directly by users, it is a dependency of the Nlp function.
                 </li>
                 <li>
                     <b>POST /apis/{id}/nlp-to-rest </b> - Translate a command given in natural language into a valid REST request. The natural language text
@@ -338,7 +348,7 @@
 			</p>
 		</section>
 		<section>
-			<h2> 8. Future plans </h2>
+			<h2 id="futurePlans"> 8. Future plans </h2>
 			<p>
 				&emsp; &emsp;
 				This implementation for the RAT project, even though it satisfies the majority of the specifications, it still needs work on certain areas
@@ -346,14 +356,19 @@
 			</p>
 			<ul>
 				<li>
-					Address the NLP limitations mentioned in <a href = "#nlpLimitations">section 4.3</a>;
+					Address the NLP limitations mentioned in <a href = "#nlpLimitations">section 4.3</a>. The current algorithm handles the general, most used case: API respecting the REST
+                    paradigm with well defined, atomic entities (i.e. <b>no tokens params</b> or custom composed paths like <b>"/pet/findBystatus"</b>) and this is by design. Working around this would imply 
+                    adding custom logic for each new API (that cnnot be added fully automatic each time) which would not scale very well (from an effort point of view) and would never assure fully
+                    complience anyway. Support for depth > 1 can be implemented by applying custom logic on keyworsds like <b>"of"</b> (i.e. "Give me the owners <b>of</b> cat named Stacy" for <b>"/felines/Stacy/owners"</b>).
+                    This also would not be always 100% accurate but would help us in being fully compliant with the REST paradigm, for at least most used use cases.
 				</li>
 				<li>
-					Implement a way to determine API credentials dynamically. As this information is not stored in the API specification, another way must be
-					found to keep this. At the same time, multiple types of auth have to be treated;
+					Implement a way to determine API credentials dynamically. The format of what kind of auth is used and who is the trusted checking entity (for Oauth2) is already shown in OpenAPI under <b>"security"</b> and <b>"securityDefinitions"</b> keywords.
+                    The exact credentials should be required when adding a new specification to Datastore and, based on the type of auth used, branching logic for each auth type supported by Open API should be supported at front-end level before creating the request to the real API.
+                    This is a really nice possible future improvement that wasn't added yet, as this project was more of a Proof Of Concept for using Nlp to transform natural sentences to REST queries;
 				</li>
 				<li>
-					Auth mechanism for our own APIs, such that not everyone can add new specifications etc..
+					Auth mechanism for our own APIs, such that not everyone can add new specifications annd so that different users can have different APIs stored under their account;
 				</li>
 			</ul>
 		</section>

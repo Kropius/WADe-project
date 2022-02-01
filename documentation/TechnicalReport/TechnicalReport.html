@@ -97,7 +97,7 @@
             is indeed followed accordingly, especially because the API Gateway specification for Google Cloud is also a <a href="https://cloud.google.com/api-gateway/docs/creating-api-config">V2 OpenApi specification</a>.
             </p>
             <p> &emsp; &emsp;
-                For storage we will be using <a href="https://cloud.google.com/firestore">Firestore</a>, Google Cloud's main NoSQL solution: Datastore. We'll be going with noSql
+                For storage we will be using Google Cloud's main NoSQL solution: <a href="https://cloud.google.com/datastore">Datastore</a>. We'll be going with noSql
             because we have only one type of entities: apis; we don't have any complex relationships between entities besides some child-parent relationships
             (api-endpoints-attributes). Also, the change of one child doesn't need to be reflected in all of its other appearences so we don't have a need for normalisation.
             </p>
@@ -107,7 +107,7 @@
             and <em><a href="#speechRecognition">4.1 Optional Preprocessing: Speech recognition</a></em> respectively.
             </p>
             <p> &emsp; &emsp;
-                We need only one page in our frontend app, so using SPA framework is an intuitive solution. We will be using Angular or React for that. Because of their nature,
+                We need only one page in our frontend app, so using SPA framework is an intuitive solution. We will be using React for that. Because of their nature,
             SPAs don't need computation power for hosting so we are fine with using <a href="https://cloud.google.com/storage">Google Cloud Storage</a> in order to provide our
             single <em>index.html</em> file and its dependencies to client browsers.
             </p>
@@ -203,7 +203,8 @@
                 it uses <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API">Web Speech API </a>.
             </p>
             <p> &emsp; &emsp;
-                As the documentation says, this library works perfect with Google Chrome. We experimented a bit with Mozilla, but there was no success using it. The <a href= "https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition">Speech Recognition documentation</a> states that browsers like Google Chrome, might use some server-based recognition engine, meaning that the speech recognition functionality will not work offline. This is true.
+                As the documentation says, this library works perfect with Google Chrome. We experimented a bit with Mozilla, but there was no success using it. The <a href= "https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition">Speech Recognition documentation</a>
+                states that browsers like Google Chrome, might use some server-based recognition engine, meaning that the speech recognition functionality will not work offline. We also tested this and it is true, the functionality will work only while being online.
             </p>
 
 			<h3 id="nlpImplementation">4.2 NLP Implementation </h3>
@@ -271,6 +272,30 @@
                 <li>
                     <b>POST /apis</b> - creates a new Api entry in the database. In this call, the OpenApi specification is parsed and relevant information is saved in Datastore
                     where it will be extracted by the Nlp function and frontend through GET and LIST endpoints;
+                    <br><br>
+                    The post api acceps only OpenAPI V3 specifications in valid Json format. Once the imput is validated, the parser will extract from the specification all the
+                    appearences of two <b>semantic triples</b> (RDF triples): <b>allowed_operations</b> and <b>allowed_attributes</b>; and other various useful metadata for the operations 
+                    that can be made from our frontend(i.e. id, url for the API the spec is reffering to, url for the specification).
+                    <ul>
+                        <li>
+                            The <b>allowed_operations</b> semantic triple is of type <b>(Verb, applicableOn, Subject)</b>. <b>Verb</b> represents any of the valid HTTP verbs (GET, POST, DELETE etc.).
+                            <b>Subject</b> is the main entity the REST endpoint is reffering to (i.e. cat is the subject for for /cats endpoint);
+                        </li>
+                        <li>
+                            The <b>allowed_attributes</b>: semantic triple is of type <b>(Subject, describedBy, Attribute)</b>. <b>Subject</b> is the main entity the REST endpoint is reffering to 
+                            (i.e. cat is the subject for for /cats endpoint). <b>Attribute</b> is any field of the Json object described by <b>Subject</b> that can either be queried (for GET, DELETE), 
+                            updated (for PATCH, PUT) or created (for POST) by the end user;
+                        </li>
+                    </ul>
+                    <br>
+                    Both <b>allowed_operations</b> and <b>allowed_attributes</b>, together with the other metadatas parser, will be saved as noSql entries in Google Datastore (example below). The two
+                    semantic triples will be saved in hierarchical form: object is child of subject (i.e. attribute is child of subject in allowed_attributes). This is for ease to use in the nlp-to-rest
+                    algorithm described in <a href="#nlpImplementation">4.2 NLP Implementation</a>.
+
+                    <figure typeOf="sa:image">
+                        <img src="../ArchitectureAndDesign/datastore-example.png" alt="Backend Storage Example">
+                        <figcaption style="text-align: center;">Fig. 5: Backend Storage Example</figcaption>
+                    </figure>
                 </li>
                 <li>
                     <b>GET /apis</b> - lists all stored api specifications. By specification, we mean all the data necessary to display
@@ -297,7 +322,7 @@
             <p> &emsp; &emsp; The user will interact with a single-page application(SPA), built with React. </p>
             <figure typeOf="sa:image" class="ignore-margins">
                 <img src="../ArchitectureAndDesign/rat-front-end.png" alt="Frontend Design">
-                <figcaption style="text-align: center;">Fig. 5: Front-end concept</figcaption>
+                <figcaption style="text-align: center;">Fig. 6: Front-end concept</figcaption>
             </figure>
             <p>&emsp; &emsp;
                 The photo above represents the final version of the UI interface. Each component has a very well defined purpose. The SwaggerUI component was created using 

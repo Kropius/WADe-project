@@ -2,11 +2,17 @@
 
 This repo represents the implementation for [RAT WADe Project](https://profs.info.uaic.ro/~busaco/teach/courses/wade/projects/index.html) of Fall 2021 made by **Cioata Matei-Alexandru, Lipan Radu-Matei, Rezmerita Mihnea-Ioan**. More information on what are the requirements can be found in the link attached.
 
-## [Midterm Deliverables—Design & Architecture](https://github.com/Kropius/WADe-project/tree/main/documentation)
-## Tags
-#project #infoiasi #wade #web
+## Midterm Deliverables—Design & Architecture
+- [initial documentation](https://github.com/Kropius/WADe-project/tree/main/documentation)
 
-### Team Notes:
+## Final Deliverables—Solution
+- [backend](https://github.com/Kropius/WADe-project/tree/main/be) accessible at [link](https://wade-rat-mihtei-rezciopan-crbqcods.ew.gateway.dev)
+- [frontend](https://github.com/Kropius/WADe-project/tree/main/fe) accessible at [link](https://storage.googleapis.com/front-end-wade2/build8/index.html)
+- [updated documentation](https://github.com/Kropius/WADe-project/tree/main/documentation)
+  - [full presentation video](<MateiC add link here>)
+  - [demo video](<MateiC add link here>)
+
+## Team Notes:
 - Run a function locally: go to its folder (Below, `be/rat/src`) and run:
 ```
 functions-framework --target apis_endpoint --debug
@@ -23,3 +29,6 @@ gcloud api-gateway api-configs create wade-rat-mihtei-rezciopan-v<version> --api
 
 gcloud api-gateway gateways update wade-rat-mihtei-rezciopan --api=wade-rat-mihtei-rezciopan --api-config=wade-rat-mihtei-rezciopan-v<version> --location=europe-west1 --project=avid-airway-337117
 ```
+
+## Tags
+#project #infoiasi #wade #web

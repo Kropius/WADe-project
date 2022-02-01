@@ -1,0 +1,25 @@
+BugsCatsWeapons:
+
+Replace the cat which has id 6 with another cat having black color and big muscles. - PUT
+
+update the cat having id 4 with black color. - PATCH
+
+Create a wand with grand power and brown color so that harry potter can kill voldemort easily. - POST
+
+Exterminate all nasty cockroaches with brown color and 6 legs. - DELETE
+
+Show me all happy cats with black color and 4 legs. - GET
+
+Show me all panthers with black color, 4 legs and happy feeling. - GET
+
+
+PetStore:
+
+create a pet with name Happy and status hungry. - POST
+
+
+Youtube:
+
+Show me the remark with id 6.
+
+Show me a video from european region.

@@ -255,10 +255,10 @@
 					a main entity and taking it as the path.
 				</li>
                 <li>
-                    The algorithm does not learn from past queries on the same api specification. this is a drawback of using a general use, already trained model like <a href="https://cloud.google.com/natural-language">Google Cloud Natural Language Processing API</a>.
+                    The algorithm does not learn from past queries on the same api specification. This is a drawback of using a general use, already trained model like <a href="https://cloud.google.com/natural-language">Google Cloud Natural Language Processing API</a>.
                     Using Google Cloud Natural Language Processing API comes with the advantage that we are getting one of the most powerful and complete Nlp models and that it works without the need for us to retrain it for each new API specification added,
                     but this advantage is also a drawback as we don't have the ability to improve the model for our very specific usecase on subsequent requests. If we find this as a feature in the future we could either try to make our fork of Google's Nlp 
-                    model or try to create a new custom model from the ground up, but this would require training for each new Api specification added which could be an unpleasent experience for the end user.
+                    model or try to create a new custom model from the ground up, but this would require training for each new Api specification added which could be an unpleasant experience for the end user.
                 </li>
 			</ul>
         </section>
@@ -355,7 +355,7 @@
 					Address the NLP limitations mentioned in <a href = "#nlpLimitations">section 4.3</a>. The current algorithm handles the general, most used case: API respecting the REST
                     paradigm with well defined, atomic entities (i.e. <b>no tokens params</b> or custom composed paths like <b>"/pet/findBystatus"</b>) and this is by design. Working around this would imply 
                     adding custom logic for each new API (that cnnot be added fully automatic each time) which would not scale very well (from an effort point of view) and would never assure fully
-                    complience anyway. Support for depth > 1 can be implemented by applying custom logic on keyworsds like <b>"of"</b> (i.e. "Give me the owners <b>of</b> cat named Stacy" for <b>"/felines/Stacy/owners"</b>).
+                    compliance anyway. Support for depth > 1 can be implemented by applying custom logic on keyworsds like <b>"of"</b> (i.e. "Give me the owners <b>of</b> cat named Stacy" for <b>"/felines/Stacy/owners"</b>).
                     This also would not be always 100% accurate but would help us in being fully compliant with the REST paradigm, for at least most used use cases.
 				</li>
 				<li>

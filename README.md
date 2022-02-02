@@ -3,12 +3,12 @@
 This repo represents the implementation for [RAT WADe Project](https://profs.info.uaic.ro/~busaco/teach/courses/wade/projects/index.html) of Fall 2021 made by **Cioata Matei-Alexandru, Lipan Radu-Matei, Rezmerita Mihnea-Ioan**. More information on what are the requirements can be found in the link attached.
 
 ## Midterm Deliverables—Design & Architecture
-- [initial documentation](https://github.com/Kropius/WADe-project/tree/main/documentation)
+- [initial documentation](https://htmlpreview.github.io/?https://github.com/Kropius/WADe-project/blob/main/documentation/TechnicalReport/TechnicalReport.html)
 
 ## Final Deliverables—Solution
 - [backend](https://github.com/Kropius/WADe-project/tree/main/be) accessible at [link](https://wade-rat-mihtei-rezciopan-crbqcods.ew.gateway.dev)
 - [frontend](https://github.com/Kropius/WADe-project/tree/main/fe) accessible at [link](https://storage.googleapis.com/front-end-wade2/build8/index.html)
-- [updated documentation](https://github.com/Kropius/WADe-project/tree/main/documentation)
+- [updated documentation](https://htmlpreview.github.io/?https://github.com/Kropius/WADe-project/blob/main/documentation/TechnicalReport/TechnicalReport.html)
   - [full presentation video](https://www.youtube.com/watch?v=U4__fntE4Mg)
   - [demo video](https://www.youtube.com/watch?v=_p1o4hvFYO4)
 

@@ -9,8 +9,8 @@ This repo represents the implementation for [RAT WADe Project](https://profs.inf
 - [backend](https://github.com/Kropius/WADe-project/tree/main/be) accessible at [link](https://wade-rat-mihtei-rezciopan-crbqcods.ew.gateway.dev)
 - [frontend](https://github.com/Kropius/WADe-project/tree/main/fe) accessible at [link](https://storage.googleapis.com/front-end-wade2/build8/index.html)
 - [updated documentation](https://github.com/Kropius/WADe-project/tree/main/documentation)
-  - [full presentation video](<MateiC add link here>)
-  - [demo video](<MateiC add link here>)
+  - [full presentation video](https://www.youtube.com/watch?v=U4__fntE4Mg)
+  - [demo video](https://www.youtube.com/watch?v=_p1o4hvFYO4)
 
 ## Team Notes:
 - Run a function locally: go to its folder (Below, `be/rat/src`) and run:
